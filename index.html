@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>GODMODE PROGRAM</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#c9a84c;--gold-light:#e8c96a;--gold-dim:#8a6b28;
+  --bg:#080808;--s1:#111;--s2:#181818;--s3:#222;--s4:#2a2a2a;
+  --text:#f0ede6;--muted:#777;--muted2:#555;
+  --red:#e05252;--green:#52b788;--blue:#5e8fd4;--orange:#e07b35;--purple:#9b72cf;
+  --border:#242424;
+  --font-head:'Bebas Neue',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --r:10px;--r-sm:6px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;overflow-x:hidden}
+h1,h2,h3,.display{font-family:var(--font-head);letter-spacing:1px}
+button{font-family:var(--font-body);cursor:pointer;border:none;outline:none}
+input,textarea{font-family:var(--font-body);outline:none}
+
+/* ─── LAYOUT ─── */
+.app{display:flex;flex-direction:column;min-height:100vh}
+.top-bar{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px}
+.top-bar-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:12px;height:56px}
+.logo{font-family:var(--font-head);font-size:1.4rem;color:var(--gold-light);letter-spacing:2px;white-space:nowrap}
+.logo span{color:var(--muted);font-size:0.85rem;letter-spacing:1px;display:block;line-height:1;margin-top:-2px}
+.top-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.week-selector{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 10px}
+.week-selector label{font-size:11px;color:var(--muted);white-space:nowrap}
+.week-selector select{background:transparent;color:var(--text);border:none;font-size:13px;font-family:var(--font-body);cursor:pointer;outline:none}
+.week-selector select option{background:#222}
+
+.main{flex:1;max-width:900px;margin:0 auto;width:100%;padding:0 16px 80px}
+
+/* ─── HERO ─── */
+.hero{padding:24px 0 20px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.hero-row{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.hero-title{font-family:var(--font-head);font-size:clamp(2rem,6vw,3rem);color:var(--gold-light);line-height:1;letter-spacing:2px}
+.hero-sub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+.hero-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.hstat{background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 10px;font-size:12px}
+.hstat-label{color:var(--muted);font-size:10px}
+.hstat-val{color:var(--gold);font-weight:500}
+
+/* ─── TAB NAV ─── */
+.day-nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;margin-bottom:16px;scrollbar-width:none}
+.day-nav::-webkit-scrollbar{display:none}
+.day-btn{flex-shrink:0;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 14px;font-family:var(--font-head);font-size:15px;letter-spacing:1px;color:var(--muted);transition:all .15s;position:relative}
+.day-btn:hover{color:var(--gold);border-color:var(--gold-dim)}
+.day-btn.active{background:#1a1208;border-color:var(--gold);color:var(--gold-light)}
+.day-btn .dot{position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:var(--green);display:none}
+.day-btn.has-data .dot{display:block}
+
+/* ─── DAY CARD ─── */
+.day-view{display:none}
+.day-view.active{display:block}
+.day-header{background:linear-gradient(135deg,#0e0c07,#0a0a0a);border:1px solid #2a2212;border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
+.dh-row{display:flex;align-items:flex-start;gap:14px}
+.day-badge{font-family:var(--font-head);font-size:1.8rem;color:var(--gold-light);background:#1a1208;border:1px solid var(--gold-dim);border-radius:var(--r-sm);padding:4px 14px;flex-shrink:0;line-height:1.2}
+.day-title{font-family:var(--font-head);font-size:clamp(1.2rem,4vw,1.6rem);color:var(--text);letter-spacing:1px}
+.day-focus{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tag{border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500}
+.t-power{background:#2a1a0a;color:#e07b35;border:1px solid rgba(224,123,53,.3)}
+.t-cal{background:#0a1f15;color:#52b788;border:1px solid rgba(82,183,136,.3)}
+.t-mob{background:#1a1030;color:#9b72cf;border:1px solid rgba(155,114,207,.3)}
+.t-cond{background:#0a1a2a;color:#5e8fd4;border:1px solid rgba(94,143,212,.3)}
+.t-rest{background:#1a1a1a;color:#888;border:1px solid #333}
+
+/* ─── ALERTS ─── */
+.alert{background:#120a0a;border:1px solid rgba(224,82,82,.25);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:8px;font-size:12px;color:#d47070;line-height:1.6}
+.alert strong{color:#e08888}
+.alert-wrap{margin-bottom:14px}
+
+/* ─── SECTIONS ─── */
+.section{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.sec-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.sec-head:hover{background:var(--s2)}
+.sec-icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.si-breath{background:#1a1a2a;color:#aaa}
+.si-mob{background:#1a1030;color:#9b72cf}
+.si-main{background:#2a1a0a;color:#e07b35}
+.si-acc{background:#0a1a2a;color:#5e8fd4}
+.si-cond{background:#0a1f15;color:#52b788}
+.si-notes{background:#2a1a1a;color:#e05252}
+.sec-title{font-family:var(--font-head);font-size:.9rem;letter-spacing:2px;color:var(--gold);flex:1}
+.sec-toggle{color:var(--muted);font-size:12px;transition:transform .2s;margin-left:auto}
+.sec-body{padding:14px 16px}
+.sec-body.collapsed{display:none}
+
+/* ─── BREATHING ─── */
+.breath-card{background:#0d0d14;border:1px solid #2a2a3a;border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px}
+.bc-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:8px}
+.bc-steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.bc-step{background:#1a1a2a;border-radius:var(--r-sm);padding:6px 10px;text-align:center;min-width:60px}
+.bc-step-n{font-family:var(--font-head);font-size:1rem;color:#9b72cf}
+.bc-step-s{font-size:10px;color:var(--muted);display:block}
+.bc-reps{font-size:11px;color:var(--gold);margin-bottom:6px}
+.bc-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ─── DRILLS ─── */
+.drill-list{list-style:none}
+.drill-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #181818;align-items:flex-start}
+.drill-item:last-child{border-bottom:none}
+.drill-arrow{color:var(--gold);flex-shrink:0;margin-top:1px;font-size:12px}
+.drill-name{font-weight:500;color:var(--text);font-size:13px}
+.drill-detail{color:var(--gold);font-size:11px;margin-left:6px}
+.drill-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:3px}
+
+/* ─── EXERCISE BLOCK ─── */
+.ex-block{background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px}
+.ex-head{padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.ex-head:hover{background:var(--s3)}
+.ex-num{font-family:var(--font-head);font-size:13px;color:var(--muted);min-width:22px}
+.ex-name{font-weight:500;font-size:14px;flex:1}
+.ex-meta{font-size:11px;color:var(--gold);font-weight:500;text-align:right;flex-shrink:0;max-width:120px}
+.ex-arr{color:var(--muted);font-size:11px;transition:transform .2s;margin-left:6px;flex-shrink:0}
+.ex-body{display:none;padding:12px 14px;border-top:1px solid var(--border);background:#0d0d0d}
+.ex-body.open{display:block}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+@media(min-width:500px){.ex-grid{grid-template-columns:repeat(4,1fr)}}
+.ex-stat{background:var(--s2);border-radius:var(--r-sm);padding:7px 10px}
+.ex-stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.ex-stat-val{font-size:13px;font-weight:500;margin-top:2px}
+.ex-note{font-size:12px;color:var(--muted);line-height:1.7;padding:10px 12px;background:#0a0a0a;border-radius:var(--r-sm);border-left:2px solid var(--gold);margin-bottom:12px}
+
+/* ─── BEGINNER NOTE ─── */
+.beginner-note{background:#0a1f10;border:1px solid rgba(82,183,136,.25);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:10px;font-size:12px;color:#72c99a;line-height:1.6}
+.beginner-note strong{color:#52b788}
+
+/* ─── TRACKER ─── */
+.tracker{background:#080e0c;border:1px solid rgba(82,183,136,.2);border-radius:var(--r-sm);padding:12px 14px;margin-top:4px}
+.tracker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tracker-title{font-size:11px;font-weight:500;color:var(--green);text-transform:uppercase;letter-spacing:1px}
+.tracker-log-btn{background:rgba(82,183,136,.15);border:1px solid rgba(82,183,136,.3);border-radius:var(--r-sm);color:var(--green);font-size:11px;padding:4px 10px;cursor:pointer;transition:all .15s}
+.tracker-log-btn:hover{background:rgba(82,183,136,.25)}
+.tracker-form{display:none;margin-bottom:10px}
+.tracker-form.open{display:block}
+.tf-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.tf-field{flex:1;min-width:80px}
+.tf-label{font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.tf-input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:13px;padding:6px 8px;transition:border-color .15s}
+.tf-input:focus{border-color:var(--green)}
+.tf-input::placeholder{color:var(--muted2)}
+.tf-actions{display:flex;gap:6px}
+.btn-save{background:rgba(82,183,136,.2);border:1px solid rgba(82,183,136,.4);color:var(--green);border-radius:var(--r-sm);padding:6px 14px;font-size:12px;transition:all .15s}
+.btn-save:hover{background:rgba(82,183,136,.35)}
+.btn-cancel{background:var(--s2);border:1px solid var(--border);color:var(--muted);border-radius:var(--r-sm);padding:6px 14px;font-size:12px}
+.history-table{width:100%;border-collapse:collapse;font-size:12px}
+.history-table th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:4px 6px;border-bottom:1px solid var(--border)}
+.history-table td{padding:5px 6px;border-bottom:1px solid #141414;color:var(--text)}
+.history-table tr:last-child td{border-bottom:none}
+.history-table tr:hover td{background:rgba(255,255,255,.02)}
+.pb-badge{background:rgba(201,168,76,.15);color:var(--gold);border-radius:4px;padding:1px 5px;font-size:10px;margin-left:4px}
+.del-entry{background:none;border:none;color:var(--muted2);font-size:11px;cursor:pointer;padding:2px 5px;border-radius:3px}
+.del-entry:hover{color:var(--red);background:rgba(224,82,82,.1)}
+.no-data{text-align:center;color:var(--muted);font-size:12px;padding:16px 0;font-style:italic}
+
+/* ─── PROGRESS CHART ─── */
+.chart-wrap{margin-top:10px;background:#050505;border-radius:var(--r-sm);padding:10px;overflow:hidden}
+.chart-canvas-wrap{position:relative;height:100px}
+.chart-svg{width:100%;height:100%;overflow:visible}
+.chart-line{fill:none;stroke:var(--green);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.chart-dot{fill:var(--green)}
+.chart-area{fill:url(#areaGrad)}
+.chart-labels{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)}
+
+/* ─── WEEKLY SUMMARY ─── */
+.summary-panel{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.summary-title{font-family:var(--font-head);font-size:1.2rem;color:var(--gold);margin-bottom:12px;letter-spacing:1px}
+.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:500px){.summary-grid{grid-template-columns:repeat(4,1fr)}}
+.sum-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;text-align:center}
+.sum-val{font-family:var(--font-head);font-size:1.8rem;color:var(--gold-light)}
+.sum-label{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+/* ─── BOTTOM NAV (mobile) ─── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,8,0.98);backdrop-filter:blur(12px);border-top:1px solid var(--border);z-index:100;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+.bnav-inner{display:flex;justify-content:space-around;max-width:500px;margin:0 auto}
+.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);padding:4px 12px;font-size:10px;letter-spacing:.5px;transition:color .15s;font-family:var(--font-body)}
+.bnav-btn.active{color:var(--gold)}
+.bnav-icon{font-size:18px}
+@media(max-width:640px){
+  .bottom-nav{display:block}
+  .top-bar{padding:0 12px}
+  .main{padding:0 12px 90px}
+  .day-nav{display:none}
+}
+
+/* ─── PROGRAM VIEW / TRACKER VIEW ─── */
+.view{display:none}
+.view.active{display:block}
+
+/* ─── OVERALL TRACKER PAGE ─── */
+.tracker-page-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.tracker-page-title{font-family:var(--font-head);font-size:1.4rem;color:var(--gold-light);letter-spacing:1px}
+.main-lift-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:500px){.main-lift-grid{grid-template-columns:1fr}}
+.lift-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.lc-name{font-family:var(--font-head);font-size:1rem;color:var(--gold);letter-spacing:1px;margin-bottom:8px}
+.lc-pr{font-family:var(--font-head);font-size:1.6rem;color:var(--text)}
+.lc-pr-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.lc-chart{margin-top:10px}
+
+/* ─── NOTES / WEEKLY LOG ─── */
+.week-notes-wrap{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.wn-title{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.wn-textarea{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:13px;padding:10px 12px;line-height:1.6;resize:vertical;min-height:80px;transition:border-color .15s}
+.wn-textarea:focus{border-color:var(--gold-dim)}
+.wn-save{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold);border-radius:var(--r-sm);padding:6px 14px;font-size:12px;margin-top:6px;transition:all .15s}
+.wn-save:hover{background:rgba(201,168,76,.25)}
+.wn-saved{font-size:11px;color:var(--green);margin-left:8px;opacity:0;transition:opacity .3s}
+.wn-saved.show{opacity:1}
+
+/* ─── EXERCISE EDIT/ADD/DELETE ─── */
+.ex-actions{display:flex;gap:5px;margin-left:auto;flex-shrink:0}
+.ex-act-btn{background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:3px 7px;cursor:pointer;transition:all .15s;font-family:var(--font-body)}
+.ex-act-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.ex-act-btn.del:hover{border-color:rgba(224,82,82,.5);color:var(--red)}
+.add-ex-btn{width:100%;background:transparent;border:1px dashed #2a2a2a;border-radius:var(--r-sm);color:var(--muted);padding:10px;font-size:12px;font-family:var(--font-body);cursor:pointer;margin-top:6px;transition:all .15s;letter-spacing:.5px}
+.add-ex-btn:hover{border-color:var(--gold-dim);color:var(--gold);background:rgba(201,168,76,.04)}
+
+/* ─── EXERCISE MODAL ─── */
+.ex-modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
+.ex-modal-overlay.open{display:flex}
+.ex-modal{background:#111;border:1px solid #2a2a2a;border-radius:var(--r) var(--r) 0 0;width:100%;max-width:560px;padding:20px;max-height:88vh;overflow-y:auto}
+.ex-modal-title{font-family:var(--font-head);font-size:1.2rem;color:var(--gold-light);letter-spacing:1px;margin-bottom:16px}
+.em-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.em-row.full{grid-template-columns:1fr}
+.em-field{display:flex;flex-direction:column;gap:4px}
+.em-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.em-input{background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:13px;padding:8px 10px;font-family:var(--font-body);transition:border-color .15s;width:100%}
+.em-input:focus{border-color:var(--gold-dim);outline:none}
+.em-textarea{resize:vertical;min-height:70px;line-height:1.5}
+.em-actions{display:flex;gap:8px;margin-top:14px}
+.em-save{flex:1;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);color:var(--gold);border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:var(--font-body);cursor:pointer;transition:all .15s}
+.em-save:hover{background:rgba(201,168,76,.3)}
+.em-cancel{background:var(--s2);border:1px solid var(--border);color:var(--muted);border-radius:var(--r-sm);padding:10px 18px;font-size:13px;font-family:var(--font-body);cursor:pointer}
+.custom-badge{background:rgba(82,183,136,.12);color:var(--green);border:1px solid rgba(82,183,136,.25);border-radius:3px;font-size:9px;padding:1px 5px;margin-left:6px;vertical-align:middle;font-family:var(--font-body)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.day-view.active{animation:fadeIn .2s ease}
+.view.active{animation:fadeIn .2s ease}
+
+/* ─── CALISTHENICS BEGINNER BADGE ─── */
+.cal-beginner-banner{background:linear-gradient(135deg,#0a1f15,#050e0a);border:1px solid rgba(82,183,136,.3);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.cbb-title{font-family:var(--font-head);font-size:1rem;color:var(--green);letter-spacing:1px;margin-bottom:6px}
+.cbb-body{font-size:12px;color:#72c99a;line-height:1.7}
+.cbb-body strong{color:var(--green)}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <div class="logo">GODMODE<span>PROGRAM</span></div>
+    <div class="top-right">
+      <div class="week-selector">
+        <label>Week</label>
+        <select id="weekSelect" onchange="changeWeek(this.value)"></select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- DAY NAV (desktop) -->
+  <div class="day-nav" id="dayNav"></div>
+
+  <!-- VIEWS -->
+  <div id="programView" class="view active">
+    <div class="hero">
+      <div class="hero-title">YOUR WEEK</div>
+      <div class="hero-sub">Powerlifting · Powerbuilding · Calisthenics · Functional</div>
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-label">Age</div><div class="hstat-val">22</div></div>
+        <div class="hstat"><div class="hstat-label">BW</div><div class="hstat-val">91 kg</div></div>
+        <div class="hstat"><div class="hstat-label">Squat</div><div class="hstat-val">190 kg</div></div>
+        <div class="hstat"><div class="hstat-label">Deadlift</div><div class="hstat-val">215 kg</div></div>
+        <div class="hstat"><div class="hstat-label">Bench</div><div class="hstat-val">120 kg</div></div>
+      </div>
+    </div>
+    <div id="dayViews"></div>
+  </div>
+
+  <div id="trackerView" class="view">
+    <div class="tracker-page-head">
+      <div class="tracker-page-title">PROGRESS TRACKER</div>
+    </div>
+    <div class="main-lift-grid" id="mainLiftCards"></div>
+    <div class="week-notes-wrap">
+      <div class="wn-title">Weekly Notes — Week <span id="noteWeekLabel">1</span></div>
+      <textarea class="wn-textarea" id="weekNotesInput" placeholder="How did this week go? Injuries, PRs, energy, sleep, nutrition notes..."></textarea>
+      <div style="display:flex;align-items:center">
+        <button class="wn-save" onclick="saveNotes()">Save Notes</button>
+        <span class="wn-saved" id="notesSaved">✓ Saved</span>
+      </div>
+    </div>
+    <div id="allExerciseHistory"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<div class="bottom-nav">
+  <div class="bnav-inner">
+    <button class="bnav-btn active" id="bnav-program" onclick="switchView('program')">
+      <span class="bnav-icon">📋</span>Program
+    </button>
+    <button class="bnav-btn" id="bnav-days" onclick="openDayPicker()">
+      <span class="bnav-icon">📅</span>Days
+    </button>
+    <button class="bnav-btn" id="bnav-tracker" onclick="switchView('tracker')">
+      <span class="bnav-icon">📈</span>Progress
+    </button>
+  </div>
+</div>
+
+<!-- EXERCISE MODAL -->
+<div class="ex-modal-overlay" id="exModal">
+  <div class="ex-modal">
+    <div class="ex-modal-title" id="exModalTitle">ADD EXERCISE</div>
+    <input type="hidden" id="emDayIdx">
+    <input type="hidden" id="emSecIdx">
+    <input type="hidden" id="emExIdx">
+    <div class="em-row full">
+      <div class="em-field">
+        <div class="em-label">Exercise Name *</div>
+        <input class="em-input" id="emName" placeholder="e.g. Romanian Deadlift">
+      </div>
+    </div>
+    <div class="em-row">
+      <div class="em-field"><div class="em-label">Sets</div><input class="em-input" id="emSets" placeholder="e.g. 4" type="number" min="1"></div>
+      <div class="em-field"><div class="em-label">Reps</div><input class="em-input" id="emReps" placeholder="e.g. 8"></div>
+    </div>
+    <div class="em-row">
+      <div class="em-field"><div class="em-label">Load</div><input class="em-input" id="emLoad" placeholder="e.g. 80kg or BW"></div>
+      <div class="em-field"><div class="em-label">Rest</div><input class="em-input" id="emRest" placeholder="e.g. 2 min"></div>
+    </div>
+    <div class="em-row">
+      <div class="em-field"><div class="em-label">Tempo</div><input class="em-input" id="emTempo" placeholder="e.g. 3-1-2"></div>
+      <div class="em-field"><div class="em-label">Meta / Label</div><input class="em-input" id="emMeta" placeholder="e.g. 4×8 @ 70%"></div>
+    </div>
+    <div class="em-row full">
+      <div class="em-field">
+        <div class="em-label">Notes (cues, technique, purpose)</div>
+        <textarea class="em-input em-textarea" id="emNote" placeholder="Coaching notes, cues, how it feels..."></textarea>
+      </div>
+    </div>
+    <div class="em-actions">
+      <button class="em-cancel" onclick="closeExModal()">Cancel</button>
+      <button class="em-save" onclick="saveExercise()">Save Exercise</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAY PICKER MODAL (mobile) -->
+<div id="dayModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);backdrop-filter:blur(4px);align-items:flex-end">
+  <div style="background:var(--s1);border-radius:var(--r) var(--r) 0 0;width:100%;max-width:500px;margin:0 auto;padding:20px;border-top:1px solid var(--border)">
+    <div style="font-family:var(--font-head);font-size:1.2rem;color:var(--gold);margin-bottom:14px;letter-spacing:1px">SELECT DAY</div>
+    <div id="modalDayBtns" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+    <button onclick="closeDayModal()" style="width:100%;margin-top:14px;background:var(--s2);border:1px solid var(--border);color:var(--muted);border-radius:var(--r-sm);padding:12px;font-size:14px;font-family:var(--font-body)">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const DAYS_DATA = [
+{
+  id:'mon',day:'Monday',label:'DAY 1',focus:'Squat · Lower Trap · Serratus · Core Bracing',
+  tags:['power','mob','cond'],
+  alerts:[
+    {t:'Neck: Avoid axial loading on neck. Use cervical retraction drills before any bar contact. No behind-neck movements ever.'},
+    {t:'Left elbow: Warm up elbow thoroughly before squat bar placement. Use high-bar grip or safety bar if pain occurs.'},
+    {t:'Arm nerve: Never let arms go numb during rack position. Check bar placement pressure on forearms.'}
+  ],
+  sections:[
+    {id:'breath',title:'BREATHING & BRACING SYSTEM',icon:'si-breath',type:'breathing',items:[
+      {title:'90-90 Diaphragmatic Breathing',steps:[{n:'Inhale',s:'4s'},{n:'Hold',s:'2s'},{n:'Exhale',s:'6s'}],reps:'10 breaths × 2 rounds',desc:'Lie 90-90. Hands on lower ribcage. Breathe ONLY into your belly. Ribs stay DOWN. Resets diaphragm-ribcage alignment.'},
+      {title:'360° Brace Drill (IAP Training)',steps:[{n:'Inhale',s:'360°'},{n:'Brace',s:'Hold'},{n:'Exhale',s:'Control'}],reps:'8 × 5s holds',desc:'Take a full breath into your BELLY — front, sides AND back expand. Hold and brace your entire midsection like you\'re about to be punched. Do NOT suck in. This is intra-abdominal pressure (IAP). Practice before every main lift set.'},
+      {title:'Crocodile Breathing',steps:[{n:'Exhale all',s:'Full'},{n:'Belly inhale',s:'Into floor'},{n:'Hold',s:'3s'}],reps:'10 breaths prone',desc:'Lie face down. Feel your BACK expand into the floor. Wakes up posterior diaphragm and teaches true 360° expansion.'}
+    ]},
+    {id:'mob',title:'MOBILITY & PREHAB — 30 min',icon:'si-mob',type:'drills',items:[
+      {name:'Cervical Retraction (Chin Tucks)',detail:'3×10, hold 2s',note:'Pull chin straight back — not down. Creates space in cervical spine. Do against wall for feedback. Addresses neck cracking.'},
+      {name:'Thoracic Extension over Foam Roller',detail:'2 min per segment',note:'3 segments. Hands behind head, EXHALE as you extend back. Addresses ribcage alignment and scapular positioning.'},
+      {name:'Scapular Wall Slides',detail:'3×12 slow reps',note:'Back flat on wall, arms at 90°. Slide arms UP keeping everything on wall. Targets serratus anterior and lower traps — your exact deficiencies.'},
+      {name:'Band Pull-Aparts + Y-T-W',detail:'3×15 each variation',note:'Use light band. Y=overhead, T=horizontal, W=rotator cuff. Slow and controlled. Rear delts + rotator cuff.'},
+      {name:'Hip 90-90 Switches',detail:'3×8 per side, 3s holds',note:'Sit in 90-90 position. Rotate hip to opposite side. Feel the internal rotation. Directly addresses hip tightness.'},
+      {name:'Hip Flexor Kneeling Lunge + Posterior Tilt',detail:'2 min per side',note:'Posterior pelvic tilt WHILE in lunge. Squeeze glute. Decompresses hip flexors and resets pelvis alignment.'},
+      {name:'Half-Kneeling Hip CARs',detail:'5 circles each direction per side',note:'Slow, deliberate, maximal range hip circles. Dehydrated fascia needs this controlled movement to rehydrate.'},
+      {name:'Wrist CARs + Flexor/Extensor Stretch',detail:'10 circles each direction + 60s per direction',note:'Both directions. Then stretch forearm flexors (palm up, push fingers back) and extensors (fist, push down). Addresses forearm strength and wrist mobility.'},
+      {name:'Nerve Flossing — Median + Ulnar',detail:'10 reps per nerve per arm',note:'MEDIAN: Arm out, wrist extended, tilt head away — gentle oscillation. ULNAR: Elbow bent max, wrist extended, head tilt. GENTLE — floss, never hold.'},
+      {name:'Serratus Activation — Protraction Push-Up Hold',detail:'3×10s holds then 3×8',note:'Top of push-up, drive shoulder blades APART (protraction). Feel serratus fire. Critical for scapular misalignment.'}
+    ]},
+    {id:'main',title:'MAIN POWERLIFTING BLOCK — 55 min',icon:'si-main',type:'exercises',items:[
+      {name:'High-Bar Back Squat — Heavy',liftKey:'squat',meta:'5×3 @ 82.5%',sets:'5',reps:'3',load:'157kg',rest:'4-5 min',tempo:'3-1-X-1',note:'BRACE before every set: 360° breath into belly, brace hard, then step under. Descent: 3s controlled. Pause 1s at bottom. Drive FAST. Cue: "Push the floor through the earth." Film from side to check depth and hip shift.'},
+      {name:'Pause Squat',meta:'3×3 @ 70%',sets:'3',reps:'3',load:'133kg',rest:'3 min',tempo:'3-3-X-1',note:'3s descent, 3s pause at bottom, explosive drive. Obliterates sticking points and demands perfect bracing. If you lose brace at bottom — weight is too heavy.'},
+      {name:'Landmine Squat (Goblet Style)',meta:'3×10',sets:'3',reps:'10',load:'40-60kg plate end',rest:'90s',tempo:'2-1-2',note:'Hold landmine end at chest. Feet wider, toes out. Corrects imbalances — your body cannot cheat the movement path. Excellent hip and ankle mobility builder.'}
+    ]},
+    {id:'acc',title:'ACCESSORY & STRUCTURAL WORK — 40 min',icon:'si-acc',type:'exercises',items:[
+      {name:'Bulgarian Split Squat',meta:'3×8/side',sets:'3',reps:'8 per leg',load:'BW+20kg',rest:'2 min',tempo:'3-1-2',note:'Rear foot elevated. Go deep. Film your hips — the higher hip side will be obvious. Actively correct each rep. Directly addresses pelvic imbalance.'},
+      {name:'Single-Leg RDL',meta:'3×10/side',sets:'3',reps:'10 per leg',load:'30-40kg DB',rest:'90s',tempo:'3-1-2',note:'Keep hips SQUARE. The weaker side will shake — that is the point. MASSIVE proprioception and imbalance corrector.'},
+      {name:'Landmine 180s',meta:'3×8/side',sets:'3',reps:'8 per side',load:'20-40kg',rest:'90s',tempo:'Controlled swing',note:'Hold landmine end, rotate side to side through the hips. Rotational strength work. Engage core the ENTIRE time. Exhale on every rotation.'},
+      {name:'Dead Bug',meta:'3×10/side',sets:'3',reps:'10 per side',load:'Bodyweight',rest:'60s',tempo:'Slow',note:'Lower back MUST stay flat. If it arches — you lost your brace. This is a core bracing DRILL. 360° brace BEFORE each rep.'},
+      {name:'Ab Wheel Rollout',meta:'3×6-10 from knees',sets:'3',reps:'6-10',load:'Bodyweight',rest:'90s',tempo:'3s out, 2s back',note:'Brace before moving. Ribs DOWN. If lower back arches at any point — stop there. Increase range weekly.'},
+      {name:'Lower Trap Y-Raises (Incline)',meta:'3×15',sets:'3',reps:'15',load:'2.5-5kg plates',rest:'60s',tempo:'2-1-3',note:'Lie face down on incline. Arms in Y. Lead with thumbs UP. Squeeze lower traps at top — hold 1s. Critical for scapular misalignment.'},
+      {name:'Face Pulls + External Rotation',meta:'3×20',sets:'3',reps:'20',load:'Light cable/band',rest:'60s',tempo:'2-1-2',note:'Pull to face level, externally rotate at end. Elbows ABOVE hands throughout. Rotator cuff + rear delts.'}
+    ]},
+    {id:'cond',title:'CONDITIONING — 25 min',icon:'si-cond',type:'exercises',items:[
+      {name:'Kettlebell Swing',meta:'5×15 / 30s rest',sets:'5',reps:'15',load:'28-32kg KB',rest:'30s',tempo:'Explosive hip hinge',note:'Drive with HIPS. Not a squat. Hike bell back aggressively. Snap hips forward. Breathe: inhale on hinge, exhale sharply on snap. Builds explosive posterior power AND cardio.'},
+      {name:'Burpee to Box Jump',meta:'4×6',sets:'4',reps:'6',load:'BW + 50-60cm box',rest:'60s',tempo:'Max effort',note:'Full burpee → immediately explode into box jump. Speed + power conditioner. Make these FAST.'}
+    ]},
+    {id:'cool',title:'COOLDOWN & FASCIA WORK',icon:'si-notes',type:'drills',items:[
+      {name:'Foam Roll — Quads, IT Band, Glutes, T-Spine',detail:'60-90s per area, SLOW',note:'Stop on tender spots 10-15s of sustained pressure. SLOW rolling only. Dehydrated fascia needs sustained pressure to rehydrate.'},
+      {name:'Pigeon Stretch',detail:'2 min per side',note:'Breathe INTO the restriction. Inhale to create space, exhale to relax deeper.'},
+      {name:'Child\'s Pose + Lat Stretch',detail:'90s',note:'Reach to one side for lateral lat/serratus stretch.'}
+    ]}
+  ]
+},
+{
+  id:'tue',day:'Tuesday',label:'DAY 2',focus:'Bench Press · Rotator Cuff · Upper Body · Serratus',
+  tags:['power','mob'],
+  alerts:[
+    {t:'Left elbow click: If you hear/feel it during warm-up, do NOT push through. Use neutral-grip (dumbbell or Swiss bar). Warm up elbow minimum 10 minutes before any pressing.'},
+    {t:'Forearm/wrist: Wrist wraps are OK but do wrist circles before every pressing warm-up set. Keep wrists as neutral as possible.'},
+    {t:'Nerve: If tingling in fingers during bench setup, adjust grip width. Wider grip often compresses ulnar nerve more.'}
+  ],
+  sections:[
+    {id:'breath',title:'BREATHING & BRACING FOR BENCH',icon:'si-breath',type:'breathing',items:[
+      {title:'Bench-Specific Bracing Drill',steps:[{n:'Setup',s:'Lie flat'},{n:'Arch',s:'Natural'},{n:'Brace',s:'360°'}],reps:'Practice 5 times before touching bar',desc:'On bench: feet flat, natural arch, shoulder blades PINCHED DOWN AND BACK. Take big 360° breath into belly. Brace like a rock. THEN take the bar. Brace must be set BEFORE unracking.'},
+      {title:'Box Breathing (Pre-Heavy Set CNS Calm)',steps:[{n:'Inhale',s:'4s'},{n:'Hold',s:'4s'},{n:'Exhale',s:'4s'},{n:'Hold',s:'4s'}],reps:'2-3 cycles before max effort sets',desc:'Calms CNS overdrive, improves focus. Use in the 2-3 minutes between heavy bench sets.'}
+    ]},
+    {id:'mob',title:'UPPER BODY PREHAB — 20 min',icon:'si-mob',type:'drills',items:[
+      {name:'Pec Minor Doorway Stretch',detail:'2 min per side',note:'Arm at 90°, lean into doorway. Pec minor tightness is a primary cause of scapular misalignment.'},
+      {name:'Band Dislocates',detail:'2×10 slow with wide grip',note:'Use light band. Rotate overhead and behind back. Mandatory before bench work.'},
+      {name:'Elbow CARs + Flexion/Extension',detail:'10 circles each arm each direction',note:'Specifically for left elbow — very slow, full range. Then 30s dead hang (decompresses elbow joint).'},
+      {name:'Wrist Mobility Circuit',detail:'60s each: circles, push-ups on fists, wrist plank',note:'Progressive wrist loading to prepare for pressing.'},
+      {name:'Nerve Floss — Ulnar Nerve (Priority Left Elbow)',detail:'10 gentle oscillations per arm',note:'Elbow maximally bent, wrist extended, hand open. Gently oscillate. NEVER force.'},
+      {name:'Rotator Cuff Band Circuit',detail:'3×15: ER at side, ER 90°, IR, Prone Y-T-W',note:'MANDATORY before any pressing. Low weight, high quality. These protect your shoulder.'},
+      {name:'Serratus Punches',detail:'3×15 each arm',note:'Standing, arm out front, punch FORWARD 2-3 inches (protraction). Feel serratus fire under armpit.'}
+    ]},
+    {id:'main',title:'MAIN BENCH BLOCK — 50 min',icon:'si-main',type:'exercises',items:[
+      {name:'Competition Bench Press — Volume',liftKey:'bench',meta:'5×5 @ 77.5%',sets:'5',reps:'5',load:'93kg',rest:'4 min',tempo:'3-1-X-1',note:'Setup ritual: Lie → pinch scapulae down/back → feet flat → arch → 360° breath + brace → unrack. Bar path: slight diagonal. Touch lower chest. Drive HARD.'},
+      {name:'Close-Grip Bench Press',meta:'4×6 @ 70%',sets:'4',reps:'6',load:'84kg',rest:'3 min',tempo:'3-1-X',note:'Grip just inside shoulder width. Elbows 45° from torso. Tricep + inner chest. Great for lockout strength.'},
+      {name:'Landmine Press',meta:'4×10/side',sets:'4',reps:'10 per side',load:'30-50kg total',rest:'90s',tempo:'2-1-2',note:'Single-arm landmine press. Split stance, rotate trunk slightly as you press. Trains rotational pushing AND shoulder-friendly. Great for serratus.'}
+    ]},
+    {id:'acc',title:'ACCESSORY — 45 min',icon:'si-acc',type:'exercises',items:[
+      {name:'Weighted Dips',meta:'4×8 @ BW+20kg',sets:'4',reps:'8',load:'BW+20kg',rest:'2 min',tempo:'3-1-X',note:'If left elbow causes pain — substitute with ring dips at bodyweight. Lean forward slightly for chest emphasis.'},
+      {name:'DB Incline Press',meta:'3×10',sets:'3',reps:'10',load:'30-35kg/hand',rest:'2 min',tempo:'3-1-2',note:'Neutral or semi-supinated grip (easier on wrist + elbow). Full stretch at bottom without losing shoulder blade position.'},
+      {name:'Ring Push-Ups',meta:'3×12-15',sets:'3',reps:'12-15',load:'Bodyweight',rest:'90s',tempo:'Slow',beginner:'BEGINNER NOTE: Regular push-ups first. If you cannot do 10 strict push-ups, do those instead. Ring push-ups are Level 2. Progress: Floor push-up → Elevated ring push-up → Ring push-up.',note:'Rings demand serratus + rotator cuff stabilization every rep. Protract fully at top. Excellent for serratus anterior.'},
+      {name:'Cable/Band Chest Fly',meta:'3×15',sets:'3',reps:'15',load:'Light',rest:'60s',tempo:'3-1-3',note:'Pure pec stretch + contraction. Arms slightly bent. Squeeze at top.'},
+      {name:'Tricep Pushdowns (Rope)',meta:'4×15',sets:'4',reps:'15',load:'Moderate',rest:'60s',tempo:'2-1-3',note:'Elbows pinned to sides. Full extension at bottom, hold 1s.'},
+      {name:'Reverse Curl + Hammer Curl',meta:'3×12 each',sets:'3',reps:'12',load:'Light',rest:'60s',tempo:'2-1-3',note:'Reverse curl (overhand) directly trains forearm extensors and brachioradialis. Forearm strength fix.'},
+      {name:'Sidelying ER Rotator Cuff',meta:'3×15 each side',sets:'3',reps:'15',load:'2.5-5kg',rest:'45s',tempo:'2-1-3',note:'Elbow bent 90°, rotate forearm up. Classic infraspinatus/teres minor isolation. Critical for rotator cuff health.'}
+    ]},
+    {id:'cond',title:'CONDITIONING — 15 min',icon:'si-cond',type:'exercises',items:[
+      {name:'Push-Up Density EMOM',meta:'10 min: 10 push-ups on the minute',sets:'10',reps:'10',load:'Bodyweight',rest:'Remainder of minute',tempo:'Controlled',beginner:'BEGINNER NOTE: Scale to whatever you can do strict each minute. Even 3-5 reps is fine to start. The goal is consistency every minute, not max reps.',note:'Builds push-up volume and conditioning. Focus on perfect scapular position (protract at top) every rep.'}
+    ]},
+    {id:'cool',title:'COOLDOWN',icon:'si-notes',type:'drills',items:[
+      {name:'Foam Roll — Pecs, Lats, Triceps, Forearms',detail:'60s each',note:'Lacrosse ball for pec minor — right against coracoid process (front shoulder, inner).'},
+      {name:'Overhead Lat Stretch + Child\'s Pose',detail:'90s each',note:''},
+      {name:'Wrist Flexor/Extensor Loaded Stretch',detail:'60s each direction each arm',note:'Fingers pointing back on floor (flexor stretch). Fist on floor dorsal side (extensor).'}
+    ]}
+  ]
+},
+{
+  id:'wed',day:'Wednesday',label:'DAY 3',focus:'Deadlift · Posterior Chain · Rotational Power',
+  tags:['power','cond'],
+  alerts:[
+    {t:'Scapula/Lat: Lat engagement is critical for deadlift. Cue "protect your armpits" — lats create a shelf for the bar path. Loose lats = bar drifts forward = lower back injury.'},
+    {t:'Hip imbalance: Deadlift stance may need minor adjustment — slightly wider on the higher hip side. Film from front every session.'},
+    {t:'Bracing: Do NOT start your pull until you have achieved maximal IAP. The Valsalva maneuver is mandatory on all pulls above 80%.'}
+  ],
+  sections:[
+    {id:'breath',title:'DEADLIFT BRACING SYSTEM',icon:'si-breath',type:'breathing',items:[
+      {title:'Valsalva Maneuver Drill',steps:[{n:'Set hips',s:'Hinge'},{n:'Lats',s:'Engage'},{n:'Breath',s:'360°'},{n:'Close',s:'Glottis'},{n:'PULL',s:''}],reps:'Practice 5 times with empty bar',desc:'Step 1: hip hinge, bar over mid-foot. Step 2: engage lats ("protect armpits", "bend the bar"). Step 3: big belly breath. Step 4: close glottis (hold breath, slight "uhhh" feeling). Step 5: PULL. Do NOT exhale until past the knee.'},
+      {title:'Posterior Breathing Drill',steps:[{n:'Hinge',s:'Hip'},{n:'Feel',s:'Back expand'},{n:'Brace',s:'All directions'}],reps:'5 reps before warm-up sets',desc:'In deadlift setup: breathe so you feel your LOWER BACK and obliques expand. 360° breathing in the pull position. Sides and back should visibly expand.'}
+    ]},
+    {id:'mob',title:'HIP & POSTERIOR CHAIN PREP — 25 min',icon:'si-mob',type:'drills',items:[
+      {name:'Hip Hinge Drill with Dowel Rod',detail:'3×10',note:'Rod on spine (touches head, upper back, tailbone). Hip hinge until rod leaves tailbone — stop. Teaches pure hip hinge vs. lumbar flexion.'},
+      {name:'Single-Leg Glute Bridge',detail:'3×12/side, 2s hold at top',note:'Drives glute activation and exposes the stronger vs weaker side. Weaker side gets extra focus.'},
+      {name:'Band-Resisted Hip Hinge',detail:'2×15',note:'Band around hips pulling you forward. Hinge back against resistance. Teaches hip drive through the lockout.'},
+      {name:'90-90 Hip Stretch + Internal Rotation',detail:'2 min per side',note:'Addresses hip tightness — internal rotation is often the limiting factor in externally-rotated dominant hips.'},
+      {name:'Hamstring Flossing',detail:'10 reps/side',note:'Seated, knee bent, extend leg and dorsiflex ankle simultaneously. Oscillate. Addresses hamstring tightness AND sciatic nerve flossing.'},
+      {name:'Thoracic Rotation (Seated with Stick)',detail:'2×10/side',note:'T-spine must rotate well for a proper conventional pull.'}
+    ]},
+    {id:'main',title:'MAIN DEADLIFT BLOCK — 55 min',icon:'si-main',type:'exercises',items:[
+      {name:'Conventional Deadlift — Heavy',liftKey:'deadlift',meta:'4×3 @ 85%',sets:'4',reps:'3',load:'183kg',rest:'5-6 min',tempo:'1-0-X-1',note:'Setup: bar over mid-foot → hinge → grip → lats → 360° breath + brace → pull slack out (pull bar INTO your body before UP) → drive floor down → past knee: drive hips through. Never jerk the bar.'},
+      {name:'Romanian Deadlift (RDL)',meta:'3×8 @ 50%',sets:'3',reps:'8',load:'107kg',rest:'2.5 min',tempo:'3-1-2',note:'Hinge only — do NOT bend knees much. Bar stays close to legs. 3s eccentric stretch. Builds hamstring + glute mass and hip hinge mechanics.'},
+      {name:'Deficit Deadlift',meta:'2×5 @ 75%',sets:'2',reps:'5',load:'161kg',rest:'4 min',tempo:'Controlled',note:'Stand on 5-10cm plates. Increases ROM — builds strength off the floor. Excellent for hip and ankle mobility over time.'},
+      {name:'Landmine RDL (Unilateral)',meta:'3×10/side',sets:'3',reps:'10 per side',load:'30-50kg',rest:'90s',tempo:'3-1-2',note:'Single-arm, same-side leg back. Hinge to landmine. Trains rotational posterior chain and addresses hip imbalance.'}
+    ]},
+    {id:'acc',title:'ACCESSORY — 35 min',icon:'si-acc',type:'exercises',items:[
+      {name:'Glute-Ham Raise / Nordic Curl',meta:'4×6-8',sets:'4',reps:'6-8',load:'Bodyweight',rest:'2 min',tempo:'3-1-X',note:'King of hamstring exercises. Nordic curl: feet anchored, lower very slowly. 4-6 reps is hard. These are HARD.'},
+      {name:'Barbell Hip Thrust',meta:'3×10 @ 100-120kg',sets:'3',reps:'10',load:'100-120kg',rest:'90s',tempo:'2-1-3',note:'Glute isolation at full hip extension. Drive knees OUT. Squeeze glutes at top for 1s. Addresses glute activation issues common with tight hip flexors.'},
+      {name:'Landmine Anti-Rotation Press',meta:'3×10/side',sets:'3',reps:'10 per side',load:'20-30kg',rest:'60s',tempo:'Slow',note:'Stand perpendicular to landmine. Press out and return. Core must NOT rotate. Anti-rotational core stability — mandatory for deadlift spinal integrity.'},
+      {name:'Suitcase Deadlift + Suitcase Carry',meta:'3×10 each + 3×30m carry',sets:'3',reps:'10 + 30m',load:'40-50kg KB',rest:'90s',tempo:'Controlled',note:'Suitcase DL = single-hand deadlift. Carry = single arm farmer\'s walk. Obliterates lateral core. The lower side works harder to maintain level hips.'},
+      {name:'Hanging Knee Raises',meta:'3×12-15',sets:'3',reps:'12-15',load:'Bodyweight',rest:'60s',tempo:'Slow',note:'Dead hang. BRACE before raising knees. Posterior pelvic tilt at top. NO swing. Also decompresses spine after heavy pulling.'}
+    ]},
+    {id:'cond',title:'CONDITIONING + ROTATIONAL POWER — 20 min',icon:'si-cond',type:'exercises',items:[
+      {name:'KB Alternating Swings + Med Ball Throws',meta:'5 rounds: 10 swings + 5 throws/side',sets:'5',reps:'10 swings + 5 throws',load:'24-32kg KB / 5-8kg ball',rest:'45s',tempo:'Explosive',note:'KB swing alternating hands at top. Then medicine ball rotational throw against wall. 5 throws each side. Pure rotational power.'},
+      {name:'Broad Jump to Sprint',meta:'4×3 jumps + 20m sprint',sets:'4',reps:'3 jumps + 20m',load:'Bodyweight',rest:'90s',tempo:'Max effort',note:'3 consecutive broad jumps → immediately sprint 20m. Explosive leg power and speed together.'}
+    ]},
+    {id:'cool',title:'COOLDOWN',icon:'si-notes',type:'drills',items:[
+      {name:'Foam Roll — Hamstrings, Glutes, Piriformis, Lower Back',detail:'60-90s per area',note:'Lacrosse ball on glutes/piriformis. Directly addresses hip tightness and fascia dehydration.'},
+      {name:'Pigeon Pose + Figure-4 Stretch',detail:'2 min per side',note:''},
+      {name:'Prone Press-Up Extension (McKenzie)',detail:'10 reps',note:'Press chest up, hips stay down, look up. Resets lumbar curve after forward hip hinge day.'}
+    ]}
+  ]
+},
+{
+  id:'thu',day:'Thursday',label:'DAY 4',focus:'Calisthenics · Pistol Squat · Handstand · Skill Work',
+  tags:['cal','mob'],
+  alerts:[
+    {t:'Wrists: Calisthenics places heavy wrist load. Spend 10 full minutes on wrist prep. If pain — elevate hands on parallettes or fists.'},
+    {t:'Elbow: If left elbow clicks during support work, load progressions from parallettes first, not floor.'},
+    {t:'Scapula: Every push skill requires full protraction at end range. Every pull skill requires full retraction AND depression. Think about this every rep.'}
+  ],
+  calisthenicsDay:true,
+  sections:[
+    {id:'breath',title:'BREATHING DRILLS',icon:'si-breath',type:'breathing',items:[
+      {title:'Hollow Body Breathing (Core Tension + Breathing)',steps:[{n:'Hollow hold',s:'Active'},{n:'Breathe',s:'Into belly'},{n:'Maintain',s:'Tension'}],reps:'3×30s hollow hold with active breathing',desc:'Breathe while maintaining a hollow body. Ribs DOWN, posterior pelvic tilt, belly breathing only. This is the foundational skill for ALL calisthenics pressing and pulling. The hardest breathing drill.'}
+    ]},
+    {id:'mob',title:'MOBILITY + SKILL PREP — 35 min',icon:'si-mob',type:'drills',items:[
+      {name:'Wrist Prep Circuit',detail:'10 min full protocol',note:'NON-NEGOTIABLE for handstand/planche work. Wrist CARs, loaded stretches, fingertip push-ups, wrist circles on fists.'},
+      {name:'Shoulder CARs (Full Circumduction)',detail:'5 slow circles each arm each direction',note:'Maximal range rotator cuff mobilization. Slow. No compensation from the trunk.'},
+      {name:'Jefferson Curl',detail:'3×8 very slow, 15-20kg only',note:'Hold a light bar. Roll down vertebra by vertebra. CONTROLLED spinal flexion. Not a stretching contest.'},
+      {name:'Pancake Stretch (Straddle)',detail:'3 min hold, rock side to side',note:'Seated straddle, lean forward. Gravity does the work. Essential for future straddle planche and L-sit width.'},
+      {name:'Pistol Squat Warm-Up: Assisted TRX Pistol',detail:'3×5/side',note:'Hold TRX/band for counterbalance. Full depth. Work the bottom of the pistol — ankle mobility and hip strength.'},
+      {name:'Skin the Cat Prep (Shoulder Opening)',detail:'3×5 (go as far as mobile)',note:'On rings or bar. Tuck knees, rotate backward as far as shoulder mobility allows. Returns through same path. DO NOT force.'},
+      {name:'Hip Flexor Activation (High Knees/March)',detail:'2×15/leg',note:'Lift knee to chest ACTIVELY — no hands. Pure hip flexor activation. Essential for L-sit and pistol squat.'}
+    ]},
+    {id:'main',title:'SKILL WORK — 60 min',icon:'si-main',type:'exercises',items:[
+      {name:'Handstand Practice — Wall-Assisted',meta:'10 min skill block',sets:'10-15 attempts',reps:'15-30s holds',load:'Bodyweight',rest:'60s between attempts',tempo:'Skill practice',beginner:'BEGINNER START HERE: First build up to a 30-second wall plank (face the wall, hands close to wall, body straight). Then practice kicking up one leg at a time. Do NOT rush to full handstand. Current goal: 15-30s wall handstand hold with straight body.',note:'Face wall kick-up. Hands 15cm from wall. Straight body, squeeze glutes, PUSH floor away (protract). Look at floor between hands.'},
+      {name:'Pistol Squat Progression',meta:'4×5/side — at YOUR level',sets:'4',reps:'5 per leg',load:'Band/TRX to BW',rest:'90s',tempo:'3-3-X',beginner:'BEGINNER PROGRESSION — pick your level: (1) Supported pistol: hold TRX/band for balance. (2) Box pistol: lower onto a bench/box. (3) Counterweight: hold 10kg plate in front. (4) Full bodyweight pistol. Master each level before moving up. The shaking is NORMAL.',note:'Work wherever you currently are. The bottom of the pistol — full dorsiflexion, hip hinge, single leg squat — is the skill to build.'},
+      {name:'L-Sit Progression',meta:'5×max hold',sets:'5',reps:'Max hold',load:'Bodyweight',rest:'90s',tempo:'Max isometric hold',beginner:'BEGINNER START HERE: Seated L-sit prep — sit on floor, legs extended, press hands into floor and try to LIFT. Even 1-2s is progress. Then move to tucked L-sit on parallettes (both knees pulled up). Only then try one leg extended. Current goal: 3×5s tucked L-sit.',note:'Push floor AWAY (protract scapula). Engage hip flexors hard. This is brutal compression strength.'},
+      {name:'Muscle-Up Progression',meta:'5×3-5 — at YOUR level',sets:'5',reps:'3-5',load:'Band-assisted or BW',rest:'2 min',tempo:'Explosive pull',beginner:'BEGINNER START HERE: You need 10 strict pull-ups before attempting muscle-ups. Current goal: Build to 10 strict pull-ups first. Work on: (1) Banded pull-ups → (2) Strict pull-ups → (3) Chest-to-bar pull-ups → (4) Band-assisted muscle-up → (5) Full muscle-up. Do NOT skip steps.',note:'Explode the pull, aggressive lean forward at top. The transition is a hip extension not an arm press.'},
+      {name:'Ring Rows (Retraction + Scapular Strength)',meta:'4×12',sets:'4',reps:'12',load:'Bodyweight at angles',rest:'90s',tempo:'2-2-2',beginner:'BEGINNER NOTE: This IS a beginner exercise. Make it horizontal for difficulty. Great place to start building pull strength.',note:'At the top: FULL retraction + depression of scapulae. Hold 1s. Directly addresses lower trap and scapular misalignment.'},
+      {name:'Dragon Flag Progression',meta:'3×5-8 negatives',sets:'3',reps:'5-8 negatives',load:'Bodyweight',rest:'2 min',tempo:'4-5s eccentric',beginner:'BEGINNER START HERE: Tuck dragon flag first — both knees pulled to chest. Lower very slowly to the bench. Return using momentum or upper body. 3-5s eccentrics. Progress to one leg extended, then full straight body.',note:'Lie on bench, grip behind head. Keep body as straight as possible. Lower very slowly. Elite core strength builder.'}
+    ]},
+    {id:'acc',title:'ACCESSORY CALISTHENICS — 30 min',icon:'si-acc',type:'exercises',items:[
+      {name:'Archer Push-Ups',meta:'3×8/side',sets:'3',reps:'8 per side',load:'Bodyweight',rest:'90s',tempo:'3-1-2',beginner:'BEGINNER: If this is too hard, do regular push-ups instead and build to 15 reps. Archer push-ups require good push-up base first.',note:'Wide push-up, shift weight to one arm (other arm straight). Builds unilateral pressing for one-arm push-up progression.'},
+      {name:'Australian Pull-Ups (Feet-Elevated)',meta:'3×15',sets:'3',reps:'15',load:'Bodyweight',rest:'90s',tempo:'2-1-3',beginner:'BEGINNER NOTE: This is an excellent beginner exercise. Easier variation: feet on floor. Harder: feet elevated. Full retraction at top every rep.',note:'Horizontal pull. Full retraction at top. Great for lower trap and mid-back volume.'},
+      {name:'Hanging Scapular Retractions',meta:'3×10',sets:'3',reps:'10',load:'Bodyweight',rest:'60s',tempo:'Slow',beginner:'BEGINNER NOTE: Perfect starting point. Dead hang, then pull shoulder blades DOWN without bending elbows. If grip fails, use straps.',note:'Dead hang → pull scapulae DOWN and BACK without bending elbows. Hold 2s. Pure lower trap isolation.'},
+      {name:'Hollow Body Hold',meta:'5×20-30s',sets:'5',reps:'20-30s hold',load:'Bodyweight',rest:'45s',tempo:'Isometric',beginner:'BEGINNER START: Tucked hollow body (knees to chest, lower back flat). 5×15-20s. Then progress to one leg extended, then both legs extended. Lower back MUST stay flat — it is the whole point.',note:'Ribs down, lower back pressed to floor, arms overhead, legs straight and low. Foundation of ALL gymnastics.'}
+    ]},
+    {id:'cond',title:'SPEED + AGILITY — 20 min',icon:'si-cond',type:'exercises',items:[
+      {name:'Sprint Intervals',meta:'8×20m / 2 min walk recovery',sets:'8',reps:'20m sprint',load:'Bodyweight',rest:'90-120s walk',tempo:'95-100% max speed',note:'FAST. Sprint mechanics: lean forward, drive knees, arms at 90°, heel to glute. Develops fast-twitch capability and pure speed.'},
+      {name:'Lateral Bound to Sprint',meta:'4×5 bounds + 10m sprint',sets:'4',reps:'5 bounds + 10m',load:'Bodyweight',rest:'90s',tempo:'Max effort',note:'5 lateral bounds then immediately sprint 10m. Lateral power and explosiveness.'}
+    ]},
+    {id:'cool',title:'COOLDOWN',icon:'si-notes',type:'drills',items:[
+      {name:'Full Pancake Stretch + Side Stretches',detail:'5 min',note:''},
+      {name:'Shoulder CARs (Cool-Down)',detail:'5 circles each arm',note:''},
+      {name:'Box Breathing (NS Down-Regulation)',detail:'5 min × 4-4-4-4',note:'Lying down. Signal PNS to activate recovery mode.'}
+    ]}
+  ]
+},
+{
+  id:'fri',day:'Friday',label:'DAY 5',focus:'Overhead Strength · Upper Back · Lower Traps · Imbalance',
+  tags:['power','mob'],
+  alerts:[
+    {t:'No behind-neck pressing: Your cervical cracking absolutely contraindicates behind-neck presses. Landmine press and neutral-grip pressing only.'},
+    {t:'Overhead mobility check: Before any overhead movement, confirm full shoulder flexion mobility (180°). If ribcage flares when reaching overhead — fix the mobility first, then load it.'}
+  ],
+  sections:[
+    {id:'breath',title:'OVERHEAD BREATHING + BRACING',icon:'si-breath',type:'breathing',items:[
+      {title:'Overhead Press Brace Drill',steps:[{n:'Stand',s:'Tall'},{n:'Rib',s:'DOWN'},{n:'Brace',s:'360°'},{n:'Press',s:'Lock'}],reps:'Practice ×5 with empty bar',desc:'Overhead pressing with a flared ribcage dumps load into lumbar spine. Ribcage must stay DOWN. Cue: "Pull ribs toward hips" BEFORE pressing. Then brace 360° and press. Bar path should end right above your traps at lockout.'},
+      {title:'Prone Thoracic Breathing',steps:[{n:'Lie prone',s:'Arms by side'},{n:'Breathe',s:'Into back'},{n:'Feel',s:'T-spine expand'}],reps:'10 breaths × 2 sets',desc:'Targets thoracic expansion. Tight T-spine is a primary limiter of overhead mobility. Do before overhead mobility drills.'}
+    ]},
+    {id:'mob',title:'OVERHEAD + UPPER BACK PREHAB — 25 min',icon:'si-mob',type:'drills',items:[
+      {name:'Wall Angel',detail:'3×10',note:'Back flat on wall — lumbar, thoracic, head all touching. Slide arms from 90° to overhead keeping everything on wall. Where you peel off = your mobility restriction.'},
+      {name:'Lat Stretch Overhead (Band-Assisted)',detail:'2 min per side',note:'Band anchored high. Grip it, step back, lean sideways. Opens the lat which limits shoulder flexion.'},
+      {name:'Banded Overhead Press Drill (Empty)',detail:'2×10',note:'Light band around wrists creating outward pull (shoulder ER). Teaches external rotation during pressing — protects rotator cuff.'},
+      {name:'Cat-Cow + Thread the Needle',detail:'2×10 + 5/side',note:'Cat-cow for spinal segmentation. Thread the needle for T-spine rotation. 5 each side with 5s hold.'},
+      {name:'Rotator Cuff Pre-Activation',detail:'2×15 each: sidelying ER + ER at 90°',note:''},
+      {name:'Lower Trap Y-Raises (Prone — Priority)',detail:'3×15 with 2.5kg',note:'Lie face down. Arms in Y at 130°. Thumbs up. Raise from the SHOULDER BLADE — lower trap initiation. Critical activation.'}
+    ]},
+    {id:'main',title:'MAIN OVERHEAD & UPPER BACK BLOCK — 50 min',icon:'si-main',type:'exercises',items:[
+      {name:'Landmine Press (Primary Overhead)',meta:'5×8/side',sets:'5',reps:'8 per side',load:'40-60kg total',rest:'2.5 min',tempo:'2-1-2',note:'Safest shoulder-friendly overhead pressing. The arc means shoulder never reaches extreme overhead. Single arm trains rotational stability. Your primary overhead builder.'},
+      {name:'Seated DB Overhead Press',meta:'4×10',sets:'4',reps:'10',load:'25-30kg/hand',rest:'2.5 min',tempo:'3-1-2',note:'Neutral or semi-pronated grip. Seated for stability. Ribs DOWN throughout. Press to directly overhead. Look forward, not up.'},
+      {name:'Barbell Row (Bent-Over)',meta:'5×5 @ 80-100kg',sets:'5',reps:'5',load:'80-100kg',rest:'3 min',tempo:'1-1-3',note:'45° torso angle. Bar to lower chest/upper abs. Explode the pull. 3s eccentric. Retract AND depress scapulae at the top. Builds upper back thickness.'},
+      {name:'Weighted Pull-Ups',meta:'5×5 @ BW+15-20kg',sets:'5',reps:'5',load:'BW+15-20kg',rest:'3 min',tempo:'2-1-3',note:'Full dead hang start. Pull to chin over bar. DEPRESS scapulae before initiating pull. 3s lowering. Lats and lower traps together.'}
+    ]},
+    {id:'acc',title:'LOWER TRAP + ROTATOR CUFF SPECIALIZATION — 35 min',icon:'si-acc',type:'exercises',items:[
+      {name:'Cable Face Pulls + External Rotation',meta:'4×20',sets:'4',reps:'20',load:'Light cable/band',rest:'45s',tempo:'2-1-2',note:'PRIORITY exercise for your issues. High cable, rope attachment, pull to face with full ER at end. Elbows ABOVE hands. Rear delt + rotator cuff + lower trap.'},
+      {name:'Band Pull-Apart Alphabet (I,Y,T,W,L)',meta:'3×15 each',sets:'3',reps:'15 per variation',load:'Light band',rest:'30s between variations',tempo:'2-1-2',note:'Each variation hits slightly different rotator cuff + periscapular musculature. I=horizontal, Y=30° above, T=90°, W=elbows bent 90°, L=ER at side.'},
+      {name:'Prone Lower Trap Raise (T-Bar)',meta:'4×15',sets:'4',reps:'15',load:'5-7.5kg',rest:'60s',tempo:'2-1-3',note:'Lie on high incline face down. Arms in T. Lead with thumbs up. SQUEEZE lower traps at top. Slow lowering. Will burn immediately.'},
+      {name:'Push-Up Plus (Serratus Focus)',meta:'3×15',sets:'3',reps:'15',load:'Bodyweight',rest:'60s',tempo:'3-1-1',note:'Regular push-up, but at the TOP — drive shoulder blades as far APART as possible (protraction). That last inch is pure serratus.'},
+      {name:'Farmer\'s Carry (Bilateral + Unilateral)',meta:'4×40m',sets:'4',reps:'40m',load:'40-50kg/hand',rest:'90s',tempo:'Walk tall',note:'Bilateral for grip + traps. Then single-arm for lateral core and hip imbalance. If one shoulder drops — that is your weak side.'},
+      {name:'Reverse Wrist Curl',meta:'4×15',sets:'4',reps:'15',load:'10-15kg bar',rest:'45s',tempo:'2-0-3',note:'Overhand grip, curl wrists up. Pure forearm extensor work. Pair with regular wrist curl to balance.'}
+    ]},
+    {id:'cond',title:'CONDITIONING — 20 min',icon:'si-cond',type:'exercises',items:[
+      {name:'Rowing Machine Intervals',meta:'6×250m / 1 min rest',sets:'6',reps:'250m',load:'Damper 5-7',rest:'1 min',tempo:'Hard effort',note:'Drive with LEGS first, then lean back, then pull arms. Trains posterior chain, breathing, and cardio. Builds breathing-under-load capacity.'}
+    ]},
+    {id:'cool',title:'COOLDOWN',icon:'si-notes',type:'drills',items:[
+      {name:'Lat + Overhead Stretch Sequence',detail:'3 min',note:''},
+      {name:'Foam Roll — Upper Back, Lats, Rear Delts',detail:'5 min',note:'Lacrosse ball on rear delt/rotator cuff area. Your scapular region specifically.'},
+      {name:'Cervical Retraction + Neck Stretch',detail:'10 retractions + 30s each side',note:'Chin tucks + gentle lateral neck stretch (ear to shoulder, NO overpressure). Addresses neck cracking.'}
+    ]}
+  ]
+},
+{
+  id:'sat',day:'Saturday',label:'DAY 6',focus:'Full Body Power · Explosive Work · Loaded Carries · Conditioning',
+  tags:['power','cond','cal'],
+  alerts:[
+    {t:'High CNS demand day: This is your most explosive session. Eat well and sleep well Friday night. If injured, replace max effort explosive work with moderate-weight technique work.'},
+    {t:'Landing mechanics: All jumping/landing must land SOFTLY — knees bent, hips back. Hard landings with straight legs will destroy your knees over time.'}
+  ],
+  sections:[
+    {id:'breath',title:'ACTIVATION BREATHING',icon:'si-breath',type:'breathing',items:[
+      {title:'Power Breathing (Explosive Activation)',steps:[{n:'5 rapid',s:'Nasal inhales'},{n:'Exhale',s:'Sharp'},{n:'Repeat',s:'×5 cycles'}],reps:'3 cycles before first explosive set',desc:'5 short sharp nasal inhales filling the lungs, then ONE sharp exhale through mouth. Repeat 5 times. Activates sympathetic nervous system and primes the body for explosive effort. Use IMMEDIATELY before every jump, sprint, or power clean attempt.'}
+    ]},
+    {id:'mob',title:'DYNAMIC WARM-UP — 20 min',icon:'si-mob',type:'drills',items:[
+      {name:'Leg Swing Series (Forward/Back + Lateral)',detail:'2×15 each leg each direction',note:'Dynamic hip mobilization. Hold a wall, swing leg through full ROM. Progressively increase range.'},
+      {name:'Inchworm + Push-Up',detail:'2×8',note:'Walk hands out to plank, push-up, walk back. Full-body dynamic warm-up.'},
+      {name:'Hip Circle + Spiderman Lunge',detail:'2×8/side each',note:'Hip circles: huge circles at hip. Spiderman lunge: step foot to hand level, twist toward front knee, reach overhead.'},
+      {name:'Jump Rope',detail:'5 min moderate pace',note:'Warms up calves, ankles, coordination, and breathing rhythm for explosive work.'},
+      {name:'Broad Jump (Sub-Max)',detail:'5 broad jumps at 70% effort',note:'CNS primer. Land soft, absorb.'}
+    ]},
+    {id:'main',title:'POWER COMPLEX — 60 min',icon:'si-main',type:'exercises',items:[
+      {name:'Power Clean (Explosive Pull)',meta:'5×3 @ 60-70% DL',sets:'5',reps:'3',load:'~130-150kg',rest:'3-4 min',tempo:'Explosive',note:'Teaches explosive hip extension — same movement as deadlift lockout but 10x faster. If technique is not solid, start from hang position (hang power clean). Drive hips THROUGH, shrug, drop under. This makes you FAST.'},
+      {name:'Box Squat — Speed Work',meta:'8×2 @ 60% — SPEED FOCUS',sets:'8',reps:'2',load:'114kg',rest:'90s max',tempo:'3-1-EXPLOSIVE',note:'Controlled descent, pause on box (eliminate stretch reflex), EXPLODE up. The point is BAR SPEED. If bar speed is slow, you went too heavy. 90s rest — no more.'},
+      {name:'Landmine Clean & Press',meta:'4×5/side',sets:'4',reps:'5 per side',load:'40-60kg',rest:'2 min',tempo:'Explosive clean, controlled press',note:'Full hip extension → clean to shoulder → press. Single arm. Rotational power + explosive posterior chain + overhead in one movement.'},
+      {name:'Trap Bar Deadlift (Explosive)',meta:'4×4 @ 80%',sets:'4',reps:'4',load:'172kg',rest:'3 min',tempo:'Controlled down, FAST up',note:'Neutral spine, drive floor down, EXPLODE. Trap bar reduces shear on lower back and allows more quad contribution. Great for speed development.'}
+    ]},
+    {id:'acc',title:'LOADED CARRIES + ROTATIONAL — 30 min',icon:'si-acc',type:'exercises',items:[
+      {name:'Farmer\'s Walk — Heavy',meta:'4×50m @ 60-70kg/hand',sets:'4',reps:'50m',load:'60-70kg per hand',rest:'2 min',tempo:'Walk fast',note:'Grip, core, traps, everything. Walk as fast as possible with perfect posture. Builds everything machines cannot.'},
+      {name:'Overhead Carry (Unilateral)',meta:'3×30m/side',sets:'3',reps:'30m per arm',load:'30-40kg KB or plate',rest:'90s',tempo:'Controlled walk',note:'One arm overhead, one arm by side. Obliterates lateral core and shoulder stability. Overhead arm LOCKED OUT.'},
+      {name:'Rotational Med Ball Slam (Diagonal)',meta:'4×8/side',sets:'4',reps:'8 per side',load:'8-10kg med ball',rest:'60s',tempo:'Max power',note:'Hold ball overhead + to one side. Slam diagonally to opposite lower corner. Full body rotational power. Training for sport.'},
+      {name:'Sled Push',meta:'4×20m heavy',sets:'4',reps:'20m',load:'80-120kg on sled',rest:'2 min',tempo:'Hard drive',note:'Drive legs, low angle, aggressive steps. Quad-dominant, cardio-brutal, no eccentric load. No sled = prowler push or heavy KB drags.'}
+    ]},
+    {id:'cond',title:'CONDITIONING CIRCUIT — 25 min',icon:'si-cond',type:'exercises',items:[
+      {name:'AMRAP KB Complex — 20 min',meta:'As many rounds as possible in 20 min',sets:'20 min AMRAP',reps:'Circuit',load:'24-28kg KB',rest:'Only when needed',tempo:'Pace yourself',note:'CIRCUIT: 10 KB swings → 5 KB cleans/side → 5 KB press/side → 10 goblet squats. Rest only when form breaks. Full body conditioning complex.'}
+    ]},
+    {id:'cool',title:'COOLDOWN',icon:'si-notes',type:'drills',items:[
+      {name:'Full Body Foam Rolling',detail:'10 min total body',note:''},
+      {name:'Full Body Stretch Sequence',detail:'10 min',note:'Hip flexors, hamstrings, quads, chest, lats, neck. Hold 60-90s each.'},
+      {name:'Cold Water Exposure (if accessible)',detail:'3-5 min cold shower or ice bath',note:'Reduces systemic inflammation. Your fascia will thank you.'}
+    ]}
+  ]
+},
+{
+  id:'sun',day:'Sunday',label:'DAY 7',focus:'Active Recovery · Deep Mobility · Fascia Work · CNS Reset',
+  tags:['mob','rest'],
+  alerts:[
+    {t:'MANDATORY DAY: You said you will work until you physically cannot. This day IS the work. Recovery is where strength is built. Skipping this = regression, not progress.'}
+  ],
+  sections:[
+    {id:'breath',title:'MORNING BREATHING PRACTICE — 15 min',icon:'si-breath',type:'breathing',items:[
+      {title:'Resonance Breathing (HRV Optimization)',steps:[{n:'Inhale',s:'5s'},{n:'Exhale',s:'5s'},{n:'No pause',s:'Repeat'}],reps:'15 min continuous — morning, lying down',desc:'5s inhale, 5s exhale. No pauses. This rhythm maximizes heart rate variability (HRV) — the measure of nervous system recovery. Do in the morning, before coffee, lying down. 15 minutes dramatically improves CNS recovery rate.'},
+      {title:'Extended Exhale (Parasympathetic Activation)',steps:[{n:'Inhale',s:'4s'},{n:'Exhale',s:'8s'},{n:'Pause',s:'2s'}],reps:'10 minutes — before sleep or any time fatigue is high',desc:'Longer exhales activate the vagus nerve and parasympathetic nervous system — switching from "fight/flight" to "rest/digest". This is recovery breathing.'}
+    ]},
+    {id:'mob',title:'DEEP MOBILITY SESSION — 60-90 min',icon:'si-mob',type:'drills',items:[
+      {name:'Full Body Foam Rolling (SLOW — Fascia Focus)',detail:'20 min total',note:'Each area: 60-90 SECONDS. Stop on tender spots. Breathe into the restriction. SLOW rolling only. Areas: calves → hamstrings → IT band → TFL/glutes → piriformis → thoracic spine → lats → pecs (lacrosse ball). Fascia dehydration means this feels terrible at first — that is your body asking for more.'},
+      {name:'Lacrosse Ball — Rotator Cuff + Pec Minor',detail:'3 min per area per side',note:'Pec minor: ball against wall, place on coracoid area, lean in, slowly raise arm. Rear shoulder: ball against wall, lean back, arm overhead, slowly move arm.'},
+      {name:'Hip Flexor 90-90 Full Protocol',detail:'3 min per side',note:'Kneeling 90-90. Posterior pelvic tilt (glute squeeze). Reach arm overhead on hip flexor side. Breathe. Feel deep in front of hip/lower abdomen. Psoas work.'},
+      {name:'Pigeon Pose Progression',detail:'3 min per side',note:'Fold forward over front shin. Breathe into piriformis and external hip rotators. Your hip tightness culprits.'},
+      {name:'Straddle Stretch (Pancake)',detail:'5 min total',note:'Sit in widest comfortable straddle. Lean forward slowly. DO NOT force. Let gravity do it over minutes. Works inner thigh fascia.'},
+      {name:'Cervical Mobility Sequence',detail:'5 min',note:'Gentle neck rolls (forward only — no backward circles). Side bends 30s each. Gentle rotation 30s each side. Chin tucks 10 reps. NEVER force.'},
+      {name:'Thoracic Segmental Extension',detail:'3 min',note:'Foam roller. 3 different thoracic levels. Arms crossed, extend over roller. Exhale as you extend.'},
+      {name:'Hip CARs (Joint Rehydration)',detail:'5 circles each direction each leg',note:'Rehydrates synovial fluid in hip joint. Slow, deliberate, maximal range. Fascia and joint capsule both benefit.'},
+      {name:'Ankle CARs + Calf Stretch (Straight + Bent Knee)',detail:'10 circles each + 90s each stretch',note:'Ankle mobility limits squat depth, pistol squat, and Olympic lifting. Bent-knee calf stretch hits soleus — the one that limits ankle dorsiflexion.'},
+      {name:'Wrist + Forearm Full Protocol',detail:'10 min',note:'Wrist CARs all directions. Loaded wrist stretches. Flexor/extensor stretch. Nerve flossing median + ulnar ×10 each.'},
+      {name:'Scapular CARs',detail:'5 full circles each shoulder',note:'Elevate → protract → depress → retract. Full scapular circumduction. Directly works on scapular misalignment through active motor control.'},
+      {name:'Jefferson Curl (Light)',detail:'2×8 very slow, 10-15kg',note:'Active recovery version — light, focusing on spinal segmentation and posterior chain fascia.'}
+    ]},
+    {id:'cond',title:'OPTIONAL LIGHT ACTIVITY — 30-45 min',icon:'si-cond',type:'exercises',items:[
+      {name:'Zone 2 Walk or Easy Jog',meta:'30-45 min',sets:'1',reps:'Continuous',load:'HR 120-140 BPM only',rest:'N/A',tempo:'Easy — hold a full conversation',note:'Zone 2 cardio increases blood flow (accelerating recovery), builds mitochondrial density, lowers systemic inflammation. If HR exceeds 150 BPM — slow down. This is NOT a workout.'},
+      {name:'Contrast Therapy',meta:'Hot 10 min → Cold 3 min × 3 cycles',sets:'3 cycles',reps:'N/A',load:'N/A',rest:'N/A',tempo:'N/A',note:'Hot shower/bath → cold. Vascular pumping flushes metabolic waste and delivers fresh blood. Dramatically accelerates recovery. Fascia dehydration responds very well to heat + cold contrast.'}
+    ]},
+    {id:'notes',title:'WEEKLY RULES — READ EVERY SUNDAY',icon:'si-notes',type:'drills',items:[
+      {name:'Track Your Lifts',detail:'Record every working set weight, reps, and RPE',note:'Without data you cannot progress. Minimum: date, lift, weight, reps, how hard it felt (RPE 1-10).'},
+      {name:'Progressive Overload',detail:'Add weight only when all sets done with good form, RPE ≤8',note:'Each week: +2.5kg on bench, +5kg on squat/deadlift IF form was perfect last week. Do NOT add weight if form broke down.'},
+      {name:'Sleep & Nutrition',detail:'Non-negotiable',note:'Minimum 8 hours. Protein: 2g/kg = 182g/day. Carbs before and after training. Creatine 5g/day. Drink 4+ liters of water — your fascia is dehydrated.'},
+      {name:'Imbalance Check (Every 2 Weeks)',detail:'Film all main lifts from front',note:'Check: are hips level in squat/deadlift? Is one shoulder higher? Are you bending more to one side on carries? Increase single-limb work on the weaker side.'},
+      {name:'Nerve Entrapment Watch',detail:'Track symptoms weekly',note:'The nerve flossing and mobility in this program is designed to help, but nerve entrapment can have structural causes needing professional assessment. If symptoms worsen — see a physiotherapist.'}
+    ]}
+  ]
+}
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let currentWeek = 1;
+let currentDayIdx = 0;
+const TOTAL_WEEKS = 12;
+
+// ─── 12-WEEK TOP SET PROGRESSION ─────────────────────────────────────────────
+// Built from last session data + all-time maxes. Target: NEW PRs by Week 12.
+// Last session: Squat 170×5×5 (moderate), Bench 100×5×5 (easy), DL 190×4×3 (hard+fatigued)
+// All-time maxes: Squat 190kg, Bench 120kg, Deadlift 215kg
+// Target PRs: Squat 200kg+, Bench 130kg+, Deadlift 225kg+
+//
+// Each entry: { kg, reps, sets, label }
+// Weeks 4 & 8 = deload, Week 12 = PR attempt
+const PROGRESSION = {
+  squat: [
+    // Accumulation block: build volume from last session level
+    { kg:175, reps:5, sets:5, label:'5×5' },   // W1 — just above last session 170×5×5
+    { kg:180, reps:4, sets:5, label:'5×4' },   // W2
+    { kg:182.5, reps:3, sets:5, label:'5×3' }, // W3
+    { kg:155, reps:5, sets:3, label:'3×5 🔄' },// W4 DELOAD
+    // Intensification block: heavier, fewer reps
+    { kg:185, reps:3, sets:5, label:'5×3' },   // W5
+    { kg:187.5, reps:2, sets:5, label:'5×2' }, // W6
+    { kg:190, reps:2, sets:4, label:'4×2' },   // W7 — matching all-time max for reps
+    { kg:160, reps:3, sets:3, label:'3×3 🔄' },// W8 DELOAD
+    // Peaking block: singles and near-max work
+    { kg:190, reps:3, sets:3, label:'3×3' },   // W9
+    { kg:195, reps:2, sets:3, label:'3×2' },   // W10 — NEW ground
+    { kg:197.5, reps:1, sets:3, label:'3×1' }, // W11
+    { kg:205, reps:1, sets:1, label:'1×1 🏆' },// W12 PR ATTEMPT
+  ],
+  bench: [
+    // Bench felt EASY at 100×5×5 — we can start heavier and progress fast
+    { kg:107.5, reps:5, sets:5, label:'5×5' }, // W1
+    { kg:110, reps:5, sets:5, label:'5×5' },   // W2
+    { kg:112.5, reps:4, sets:5, label:'5×4' }, // W3
+    { kg:95, reps:5, sets:3, label:'3×5 🔄' }, // W4 DELOAD
+    { kg:115, reps:4, sets:4, label:'4×4' },   // W5
+    { kg:117.5, reps:3, sets:4, label:'4×3' }, // W6
+    { kg:120, reps:2, sets:4, label:'4×2' },   // W7 — matching all-time max for reps
+    { kg:100, reps:3, sets:3, label:'3×3 🔄' },// W8 DELOAD
+    { kg:120, reps:3, sets:3, label:'3×3' },   // W9 — 3 reps at old max
+    { kg:122.5, reps:2, sets:3, label:'3×2' }, // W10 — NEW ground
+    { kg:125, reps:1, sets:3, label:'3×1' },   // W11
+    { kg:132.5, reps:1, sets:1, label:'1×1 🏆' },// W12 PR — bench has most room
+  ],
+  deadlift: [
+    // DL was hard at 190×4×3 with fatigue — true max likely ~210-215. Start conservative.
+    { kg:192.5, reps:3, sets:4, label:'4×3' }, // W1 — just above last session
+    { kg:197.5, reps:3, sets:4, label:'4×3' }, // W2
+    { kg:202.5, reps:2, sets:4, label:'4×2' }, // W3
+    { kg:170, reps:3, sets:3, label:'3×3 🔄' },// W4 DELOAD
+    { kg:205, reps:2, sets:4, label:'4×2' },   // W5
+    { kg:207.5, reps:2, sets:3, label:'3×2' }, // W6
+    { kg:210, reps:1, sets:4, label:'4×1' },   // W7
+    { kg:170, reps:2, sets:3, label:'3×2 🔄' },// W8 DELOAD
+    { kg:212.5, reps:2, sets:3, label:'3×2' }, // W9
+    { kg:215, reps:2, sets:2, label:'2×2' },   // W10 — matching all-time max for reps
+    { kg:217.5, reps:1, sets:2, label:'2×1' }, // W11 — NEW ground
+    { kg:227.5, reps:1, sets:1, label:'1×1 🏆' },// W12 PR ATTEMPT
+  ]
+};
+
+function getTopSet(lift, week) {
+  const p = PROGRESSION[lift][week - 1];
+  return { kg: p.kg, reps: p.reps, sets: p.sets, label: p.label };
+}
+
+// Returns display strings for meta and load fields
+function getLiftDisplay(liftKey, week) {
+  const ts = getTopSet(liftKey, week);
+  const isDeload = week === 4 || week === 8;
+  const isPeak = week === 12;
+  const suffix = isDeload ? ' DELOAD' : isPeak ? ' PR DAY' : '';
+  return {
+    meta: `${ts.label}${suffix}`,
+    load: `${ts.kg}kg`
+  };
+}
+
+function getStorage(){
+  try{return JSON.parse(localStorage.getItem('godmode_data')||'{}')}catch(e){return{}}
+}
+function setStorage(data){
+  try{localStorage.setItem('godmode_data',JSON.stringify(data))}catch(e){}
+}
+function getData(key,def){const d=getStorage();return d[key]!==undefined?d[key]:def}
+function setData(key,val){const d=getStorage();d[key]=val;setStorage(d)}
+
+// ─── WEEK SELECT ─────────────────────────────────────────────────────────────
+function buildWeekSelect(){
+  const sel=document.getElementById('weekSelect');
+  for(let w=1;w<=TOTAL_WEEKS;w++){
+    const o=document.createElement('option');
+    o.value=w;o.textContent='Week '+w;
+    sel.appendChild(o);
+  }
+  const saved=getData('currentWeek',1);
+  currentWeek=saved;
+  sel.value=currentWeek;
+}
+function changeWeek(w){
+  currentWeek=parseInt(w);
+  setData('currentWeek',currentWeek);
+  document.getElementById('noteWeekLabel').textContent=currentWeek;
+  const notes=getData('notes_w'+currentWeek,'');
+  document.getElementById('weekNotesInput').value=notes;
+  updateLiftDisplays();
+  highlightCurrentWeekColumn();
+  refreshTrackerData();
+  updateDayNavDots();
+}
+
+// Update all main-lift top-set displays when week changes
+function updateLiftDisplays(){
+  document.querySelectorAll('[data-liftkey]').forEach(el=>{
+    const lk=el.getAttribute('data-liftkey');
+    if(!lk)return;
+    const ld=getLiftDisplay(lk,currentWeek);
+    const ts=getTopSet(lk,currentWeek);
+    if(el.classList.contains('ex-meta')){
+      el.textContent=ld.meta;
+      // also update stat cells inside the same ex-block
+      const exId=el.id.replace('meta-','');
+      const setsEl=document.getElementById('stat-sets-'+exId);
+      const repsEl=document.getElementById('stat-reps-'+exId);
+      if(setsEl)setsEl.textContent=String(ts.sets);
+      if(repsEl)repsEl.textContent=String(ts.reps);
+    } else {
+      el.textContent=ld.load;
+    }
+  });
+}
+
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+const DAY_LABELS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+function buildDayNav(){
+  const nav=document.getElementById('dayNav');
+  const modal=document.getElementById('modalDayBtns');
+  DAYS_DATA.forEach((d,i)=>{
+    // desktop nav
+    const btn=document.createElement('button');
+    btn.className='day-btn'+(i===0?' active':'');
+    btn.id='daybtn-'+i;
+    btn.innerHTML=DAY_LABELS[i]+'<span class="dot"></span>';
+    btn.onclick=()=>selectDay(i);
+    nav.appendChild(btn);
+    // modal
+    const mbtn=document.createElement('button');
+    mbtn.style.cssText='background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;color:var(--text);font-size:14px;font-family:var(--font-head);letter-spacing:1px;text-align:left';
+    mbtn.innerHTML='<div style="color:var(--gold)">'+(i+1)+'. '+DAY_LABELS[i]+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--font-body)">'+d.day+'</div>';
+    mbtn.onclick=()=>{selectDay(i);closeDayModal();};
+    modal.appendChild(mbtn);
+  });
+}
+function selectDay(idx){
+  currentDayIdx=idx;
+  document.querySelectorAll('.day-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.querySelectorAll('.day-view').forEach((v,i)=>v.classList.toggle('active',i===idx));
+}
+function updateDayNavDots(){
+  DAYS_DATA.forEach((d,i)=>{
+    let hasAny=false;
+    d.sections.forEach(s=>{
+      if(s.type==='exercises'){
+        s.items.forEach(e=>{
+          const key='log_w'+currentWeek+'_'+d.id+'_'+e.name.replace(/\s/g,'_');
+          const logs=getData(key,[]);
+          if(logs.length>0)hasAny=true;
+        });
+      }
+    });
+    const btn=document.getElementById('daybtn-'+i);
+    if(btn)btn.classList.toggle('has-data',hasAny);
+  });
+}
+
+// ─── BUILD DAY VIEWS ─────────────────────────────────────────────────────────
+function tagHTML(tags){
+  const map={power:'t-power',cal:'t-cal',mob:'t-mob',cond:'t-cond',rest:'t-rest'};
+  const labels={power:'Powerlifting',cal:'Calisthenics',mob:'Mobility',cond:'Conditioning',rest:'Recovery'};
+  return tags.map(t=>`<span class="tag ${map[t]}">${labels[t]}</span>`).join('');
+}
+function buildDayViews(){
+  const container=document.getElementById('dayViews');
+  DAYS_DATA.forEach((d,di)=>{
+    const view=document.createElement('div');
+    view.className='day-view'+(di===0?' active':'');
+    view.id='dv-'+di;
+
+    let html=`<div class="day-header"><div class="dh-row"><div class="day-badge">${d.label}</div><div><div class="day-title">${d.day}</div><div class="day-focus">${d.focus}</div></div></div><div class="tag-row">${tagHTML(d.tags)}</div></div>`;
+
+    // calisthenics beginner banner
+    if(d.calisthenicsDay){
+      html+=`<div class="cal-beginner-banner"><div class="cbb-title">BEGINNER CALISTHENICS — READ THIS FIRST</div><div class="cbb-body">You are a complete beginner at calisthenics. This means you start at the <strong>lowest progression</strong> of every skill. Tap each exercise to see your <strong>BEGINNER START HERE</strong> note — follow those instructions, not the main programming. The goal for the first 4-8 weeks is <strong>movement quality and body awareness</strong>, not impressive reps. Calisthenics takes patience. The progressions exist for a reason. Every exercise has beginner modifications listed.</div></div>`;
+    }
+
+    // alerts
+    if(d.alerts && d.alerts.length){
+      html+='<div class="alert-wrap">';
+      d.alerts.forEach(a=>html+=`<div class="alert">⚠ ${a.t}</div>`);
+      html+='</div>';
+    }
+
+    // sections
+    d.sections.forEach((s,si)=>{
+      const secId=`sec-${di}-${si}`;
+      html+=`<div class="section"><div class="sec-head" onclick="toggleSection('${secId}')"><div class="sec-icon ${s.icon}">▪</div><div class="sec-title">${s.title}</div><span class="sec-toggle" id="${secId}-arr">▼</span></div><div class="sec-body" id="${secId}">`;
+      if(s.type==='breathing'){
+        s.items.forEach(b=>{
+          html+=`<div class="breath-card"><div class="bc-title">${b.title}</div><div class="bc-steps">${b.steps.map(st=>`<div class="bc-step"><div class="bc-step-n">${st.n}</div><span class="bc-step-s">${st.s}</span></div>`).join('')}</div><div class="bc-reps">${b.reps}</div><div class="bc-desc">${b.desc}</div></div>`;
+        });
+      } else if(s.type==='drills'){
+        html+='<ul class="drill-list">';
+        s.items.forEach(dr=>{
+          html+=`<li class="drill-item"><span class="drill-arrow">→</span><div><div class="drill-name">${dr.name} <span class="drill-detail">${dr.detail||''}</span></div><div class="drill-note">${dr.note}</div></div></li>`;
+        });
+        html+='</ul>';
+      } else if(s.type==='exercises'){
+        // Merge built-in (with overrides) + custom exercises
+        const customKey='custom_ex_'+d.id+'_'+si;
+        const customExs=getData(customKey,[]);
+        const overriddenItems=s.items.map((e,bi)=>{
+          const ov=getData('override_ex_'+d.id+'_'+si+'_'+bi,null);
+          return ov?{...e,...ov,_builtin:true}:{...e,_builtin:true};
+        });
+        const allExs=[...overriddenItems,...customExs.map(e=>({...e,_builtin:false}))];
+
+        allExs.forEach((e,ei)=>{
+          const isCustom=!e._builtin;
+          const exId=`ex-${di}-${si}-${ei}`;
+          const logKey='log_w'+currentWeek+'_'+d.id+'_'+e.name.replace(/\s/g,'_');
+          let dispMeta=e.meta||'', dispLoad=e.load||'—', dispSets=e.sets||'—', dispReps=e.reps||'—';
+          if(e.liftKey){
+            const ld=getLiftDisplay(e.liftKey,currentWeek);
+            const ts=getTopSet(e.liftKey,currentWeek);
+            dispMeta=ld.meta; dispLoad=ld.load;
+            dispSets=String(ts.sets); dispReps=String(ts.reps);
+          }
+          const liftAttr=e.liftKey?`data-liftkey="${e.liftKey}"`:'';
+          const customBadge=isCustom?'<span class="custom-badge">CUSTOM</span>':'';
+          const editBtn=`<button class="ex-act-btn" onclick="event.stopPropagation();openEditExercise(${di},${si},${ei})">✏</button>`;
+          const delBtn=isCustom?`<button class="ex-act-btn del" onclick="event.stopPropagation();deleteExercise(${di},${si},${ei})">✕</button>`:'';
+          html+=`<div class="ex-block" id="eb-${exId}"><div class="ex-head" onclick="toggleEx('${exId}')"><span class="ex-num">${String(ei+1).padStart(2,'0')}</span><span class="ex-name">${e.name}${customBadge}</span><span class="ex-meta" id="meta-${exId}" ${liftAttr}>${dispMeta}</span><div class="ex-actions">${editBtn}${delBtn}</div><span class="ex-arr" id="${exId}-arr">▼</span></div><div class="ex-body" id="${exId}">`;
+          html+=`<div class="ex-grid"><div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val" id="stat-sets-${exId}">${dispSets}</div></div><div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val" id="stat-reps-${exId}">${dispReps}</div></div><div class="ex-stat"><div class="ex-stat-label">Load</div><div class="ex-stat-val" id="stat-load-${exId}" ${liftAttr}>${dispLoad}</div></div><div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">${e.rest||'—'}</div></div></div>`;
+          if(e.tempo) html+=`<div class="ex-grid" style="margin-bottom:10px"><div class="ex-stat" style="grid-column:span 2"><div class="ex-stat-label">Tempo</div><div class="ex-stat-val">${e.tempo}</div></div></div>`;
+          if(e.beginner) html+=`<div class="beginner-note"><strong>🟢 BEGINNER START HERE:</strong> ${e.beginner}</div>`;
+          if(e.note) html+=`<div class="ex-note">${e.note}</div>`;
+          html+=`<div class="tracker"><div class="tracker-head"><div class="tracker-title">📊 Log This Exercise</div><button class="tracker-log-btn" onclick="openLogForm('${exId}','${d.id}','${e.name.replace(/'/g,"\\'")}')">+ Log Set</button></div><div class="tracker-form" id="form-${exId}"><div class="tf-row"><div class="tf-field"><div class="tf-label">Weight (kg)</div><input class="tf-input" type="number" id="w-${exId}" placeholder="0" step="0.5"></div><div class="tf-field"><div class="tf-label">Reps</div><input class="tf-input" type="number" id="r-${exId}" placeholder="0"></div><div class="tf-field"><div class="tf-label">Sets Done</div><input class="tf-input" type="number" id="s-${exId}" placeholder="1"></div><div class="tf-field"><div class="tf-label">RPE (1-10)</div><input class="tf-input" type="number" id="rpe-${exId}" placeholder="8" min="1" max="10"></div></div><div class="tf-actions"><button class="btn-save" onclick="saveLog('${exId}','${d.id}','${e.name.replace(/'/g,"\\'")}')">Save</button><button class="btn-cancel" onclick="closeLogForm('${exId}')">Cancel</button></div></div><div id="hist-${exId}"></div></div>`;
+          html+='</div></div>';
+        });
+        // Add exercise button
+        html+=`<button class="add-ex-btn" onclick="openAddExercise(${di},${si})">+ Add Exercise</button>`;
+      }
+      html+='</div></div>';
+    });
+
+    view.innerHTML=html;
+    container.appendChild(view);
+  });
+}
+
+// ─── EXERCISE CRUD ───────────────────────────────────────────────────────────
+let _editMode=false; // false=add, true=edit
+let _editDi=-1,_editSi=-1,_editEi=-1;
+
+function openAddExercise(di,si){
+  _editMode=false; _editDi=di; _editSi=si; _editEi=-1;
+  document.getElementById('exModalTitle').textContent='ADD EXERCISE';
+  ['Name','Sets','Reps','Load','Rest','Tempo','Meta','Note'].forEach(f=>{ const el=document.getElementById('em'+f); if(el)el.value=''; });
+  document.getElementById('exModal').classList.add('open');
+}
+
+function openEditExercise(di,si,ei){
+  _editMode=true; _editDi=di; _editSi=si; _editEi=ei;
+  document.getElementById('exModalTitle').textContent='EDIT EXERCISE';
+
+  // Get the exercise (builtin + custom merged)
+  const d=DAYS_DATA[di], s=d.sections[si];
+  const customKey='custom_ex_'+d.id+'_'+si;
+  const customExs=getData(customKey,[]);
+  const allExs=[...s.items,...customExs];
+  const e=allExs[ei];
+  if(!e)return;
+
+  document.getElementById('emName').value=e.name||'';
+  document.getElementById('emSets').value=e.sets||'';
+  document.getElementById('emReps').value=e.reps||'';
+  document.getElementById('emLoad').value=e.load||'';
+  document.getElementById('emRest').value=e.rest||'';
+  document.getElementById('emTempo').value=e.tempo||'';
+  document.getElementById('emMeta').value=e.meta||'';
+  document.getElementById('emNote').value=e.note||'';
+  document.getElementById('exModal').classList.add('open');
+}
+
+function closeExModal(){
+  document.getElementById('exModal').classList.remove('open');
+}
+
+function saveExercise(){
+  const name=document.getElementById('emName').value.trim();
+  if(!name){document.getElementById('emName').style.borderColor='var(--red)';return;}
+  document.getElementById('emName').style.borderColor='';
+
+  const ex={
+    name,
+    sets:document.getElementById('emSets').value.trim(),
+    reps:document.getElementById('emReps').value.trim(),
+    load:document.getElementById('emLoad').value.trim()||'—',
+    rest:document.getElementById('emRest').value.trim(),
+    tempo:document.getElementById('emTempo').value.trim(),
+    meta:document.getElementById('emMeta').value.trim(),
+    note:document.getElementById('emNote').value.trim(),
+  };
+
+  const d=DAYS_DATA[_editDi], s=d.sections[_editSi];
+  const customKey='custom_ex_'+d.id+'_'+_editSi;
+  const customExs=getData(customKey,[]);
+  const builtinCount=s.items.length;
+
+  if(_editMode){
+    if(_editEi<builtinCount){
+      // Editing a built-in: save override in a separate key
+      const overrideKey='override_ex_'+d.id+'_'+_editSi+'_'+_editEi;
+      setData(overrideKey,ex);
+    } else {
+      // Editing a custom
+      const customIdx=_editEi-builtinCount;
+      customExs[customIdx]={...customExs[customIdx],...ex};
+      setData(customKey,customExs);
+    }
+  } else {
+    customExs.push(ex);
+    setData(customKey,customExs);
+  }
+
+  closeExModal();
+  rebuildDayView(_editDi);
+}
+
+function deleteExercise(di,si,ei){
+  const d=DAYS_DATA[di], s=d.sections[si];
+  const customKey='custom_ex_'+d.id+'_'+si;
+  const customExs=getData(customKey,[]);
+  const builtinCount=s.items.length;
+  if(ei<builtinCount) return; // can't delete built-ins (only edit)
+  const customIdx=ei-builtinCount;
+  if(!confirm('Delete this exercise?'))return;
+  customExs.splice(customIdx,1);
+  setData(customKey,customExs);
+  rebuildDayView(di);
+}
+
+function rebuildDayView(di){
+  const container=document.getElementById('dayViews');
+  const oldView=document.getElementById('dv-'+di);
+  const wasActive=oldView&&oldView.classList.contains('active');
+
+  // Rebuild just this day view
+  const d=DAYS_DATA[di];
+  const view=document.createElement('div');
+  view.className='day-view'+(wasActive?' active':'');
+  view.id='dv-'+di;
+
+  let html=`<div class="day-header"><div class="dh-row"><div class="day-badge">${d.label}</div><div><div class="day-title">${d.day}</div><div class="day-focus">${d.focus}</div></div></div><div class="tag-row">${tagHTML(d.tags)}</div></div>`;
+  if(d.calisthenicsDay){
+    html+=`<div class="cal-beginner-banner"><div class="cbb-title">BEGINNER CALISTHENICS — READ THIS FIRST</div><div class="cbb-body">You are a complete beginner at calisthenics. This means you start at the <strong>lowest progression</strong> of every skill. Tap each exercise to see your <strong>BEGINNER START HERE</strong> note — follow those instructions, not the main programming. The goal for the first 4-8 weeks is <strong>movement quality and body awareness</strong>, not impressive reps. Calisthenics takes patience. The progressions exist for a reason. Every exercise has beginner modifications listed.</div></div>`;
+  }
+  if(d.alerts&&d.alerts.length){
+    html+='<div class="alert-wrap">';
+    d.alerts.forEach(a=>html+=`<div class="alert">⚠ ${a.t}</div>`);
+    html+='</div>';
+  }
+
+  d.sections.forEach((s,si)=>{
+    // Apply any built-in overrides
+    const overriddenItems=s.items.map((e,ei)=>{
+      const ov=getData('override_ex_'+d.id+'_'+si+'_'+ei,null);
+      return ov?{...e,...ov}:e;
+    });
+    const customKey='custom_ex_'+d.id+'_'+si;
+    const customExs=getData(customKey,[]);
+
+    const secId=`sec-${di}-${si}`;
+    html+=`<div class="section"><div class="sec-head" onclick="toggleSection('${secId}')"><div class="sec-icon ${s.icon}">▪</div><div class="sec-title">${s.title}</div><span class="sec-toggle" id="${secId}-arr">▼</span></div><div class="sec-body" id="${secId}">`;
+
+    if(s.type==='breathing'){
+      s.items.forEach(b=>{
+        html+=`<div class="breath-card"><div class="bc-title">${b.title}</div><div class="bc-steps">${b.steps.map(st=>`<div class="bc-step"><div class="bc-step-n">${st.n}</div><span class="bc-step-s">${st.s}</span></div>`).join('')}</div><div class="bc-reps">${b.reps}</div><div class="bc-desc">${b.desc}</div></div>`;
+      });
+    } else if(s.type==='drills'){
+      html+='<ul class="drill-list">';
+      s.items.forEach(dr=>{
+        html+=`<li class="drill-item"><span class="drill-arrow">→</span><div><div class="drill-name">${dr.name} <span class="drill-detail">${dr.detail||''}</span></div><div class="drill-note">${dr.note}</div></div></li>`;
+      });
+      html+='</ul>';
+    } else if(s.type==='exercises'){
+      const allExs=[...overriddenItems.map(e=>({...e,_builtin:true})),...customExs.map(e=>({...e,_builtin:false}))];
+      allExs.forEach((e,ei)=>{
+        const isCustom=!e._builtin;
+        const exId=`ex-${di}-${si}-${ei}`;
+        let dispMeta=e.meta||'', dispLoad=e.load||'—', dispSets=e.sets||'—', dispReps=e.reps||'—';
+        if(e.liftKey){
+          const ld=getLiftDisplay(e.liftKey,currentWeek);
+          const ts=getTopSet(e.liftKey,currentWeek);
+          dispMeta=ld.meta; dispLoad=ld.load;
+          dispSets=String(ts.sets); dispReps=String(ts.reps);
+        }
+        const liftAttr=e.liftKey?`data-liftkey="${e.liftKey}"`:'';
+        const customBadge=isCustom?'<span class="custom-badge">CUSTOM</span>':'';
+        const editBtn=`<button class="ex-act-btn" onclick="event.stopPropagation();openEditExercise(${di},${si},${ei})">✏</button>`;
+        const delBtn=isCustom?`<button class="ex-act-btn del" onclick="event.stopPropagation();deleteExercise(${di},${si},${ei})">✕</button>`:'';
+        html+=`<div class="ex-block" id="eb-${exId}"><div class="ex-head" onclick="toggleEx('${exId}')"><span class="ex-num">${String(ei+1).padStart(2,'0')}</span><span class="ex-name">${e.name}${customBadge}</span><span class="ex-meta" id="meta-${exId}" ${liftAttr}>${dispMeta}</span><div class="ex-actions">${editBtn}${delBtn}</div><span class="ex-arr" id="${exId}-arr">▼</span></div><div class="ex-body" id="${exId}">`;
+        html+=`<div class="ex-grid"><div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val" id="stat-sets-${exId}">${dispSets}</div></div><div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val" id="stat-reps-${exId}">${dispReps}</div></div><div class="ex-stat"><div class="ex-stat-label">Load</div><div class="ex-stat-val" id="stat-load-${exId}" ${liftAttr}>${dispLoad}</div></div><div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">${e.rest||'—'}</div></div></div>`;
+        if(e.tempo)html+=`<div class="ex-grid" style="margin-bottom:10px"><div class="ex-stat" style="grid-column:span 2"><div class="ex-stat-label">Tempo</div><div class="ex-stat-val">${e.tempo}</div></div></div>`;
+        if(e.beginner)html+=`<div class="beginner-note"><strong>🟢 BEGINNER START HERE:</strong> ${e.beginner}</div>`;
+        if(e.note)html+=`<div class="ex-note">${e.note}</div>`;
+        html+=`<div class="tracker"><div class="tracker-head"><div class="tracker-title">📊 Log This Exercise</div><button class="tracker-log-btn" onclick="openLogForm('${exId}','${d.id}','${e.name.replace(/'/g,"\\'")}')">+ Log Set</button></div><div class="tracker-form" id="form-${exId}"><div class="tf-row"><div class="tf-field"><div class="tf-label">Weight (kg)</div><input class="tf-input" type="number" id="w-${exId}" placeholder="0" step="0.5"></div><div class="tf-field"><div class="tf-label">Reps</div><input class="tf-input" type="number" id="r-${exId}" placeholder="0"></div><div class="tf-field"><div class="tf-label">Sets Done</div><input class="tf-input" type="number" id="s-${exId}" placeholder="1"></div><div class="tf-field"><div class="tf-label">RPE (1-10)</div><input class="tf-input" type="number" id="rpe-${exId}" placeholder="8" min="1" max="10"></div></div><div class="tf-actions"><button class="btn-save" onclick="saveLog('${exId}','${d.id}','${e.name.replace(/'/g,"\\'")}')">Save</button><button class="btn-cancel" onclick="closeLogForm('${exId}')">Cancel</button></div></div><div id="hist-${exId}"></div></div>`;
+        html+='</div></div>';
+      });
+      html+=`<button class="add-ex-btn" onclick="openAddExercise(${di},${si})">+ Add Exercise</button>`;
+    }
+    html+='</div></div>';
+  });
+
+  view.innerHTML=html;
+  if(oldView) oldView.replaceWith(view);
+  else container.appendChild(view);
+  updateLiftDisplays();
+}
+
+// Close modal on overlay click
+document.getElementById('exModal').addEventListener('click',function(e){
+  if(e.target===this)closeExModal();
+});
+function toggleSection(id){
+  const body=document.getElementById(id);
+  const arr=document.getElementById(id+'-arr');
+  const open=body.classList.toggle('collapsed');
+  if(arr)arr.style.transform=open?'rotate(-90deg)':'';
+}
+
+// ─── EXERCISE TOGGLE ─────────────────────────────────────────────────────────
+function toggleEx(id){
+  const body=document.getElementById(id);
+  const arr=document.getElementById(id+'-arr');
+  const open=body.classList.toggle('open');
+  if(arr)arr.style.transform=open?'rotate(180deg)':'';
+  if(open)renderHistory(id);
+}
+
+// ─── LOG FORM ────────────────────────────────────────────────────────────────
+function openLogForm(exId,dayId,exName){
+  document.getElementById('form-'+exId).classList.add('open');
+  document.getElementById('w-'+exId).focus();
+}
+function closeLogForm(exId){
+  document.getElementById('form-'+exId).classList.remove('open');
+}
+function saveLog(exId,dayId,exName){
+  const weight=parseFloat(document.getElementById('w-'+exId).value)||0;
+  const reps=parseInt(document.getElementById('r-'+exId).value)||0;
+  const sets=parseInt(document.getElementById('s-'+exId).value)||1;
+  const rpe=parseInt(document.getElementById('rpe-'+exId).value)||0;
+  if(!weight&&!reps)return;
+  const key='log_w'+currentWeek+'_'+dayId+'_'+exName.replace(/\s/g,'_');
+  const logs=getData(key,[]);
+  logs.push({weight,reps,sets,rpe,date:new Date().toLocaleDateString()});
+  setData(key,logs);
+  // clear
+  document.getElementById('w-'+exId).value='';
+  document.getElementById('r-'+exId).value='';
+  document.getElementById('s-'+exId).value='';
+  document.getElementById('rpe-'+exId).value='';
+  closeLogForm(exId);
+  renderHistory(exId);
+  updateDayNavDots();
+  renderAllExerciseHistory();
+}
+function deleteLog(exId,dayId,exName,idx){
+  const key='log_w'+currentWeek+'_'+dayId+'_'+exName.replace(/\s/g,'_');
+  const logs=getData(key,[]);
+  logs.splice(idx,1);
+  setData(key,logs);
+  renderHistory(exId);
+  renderAllExerciseHistory();
+}
+function renderHistory(exId){
+  const hist=document.getElementById('hist-'+exId);
+  if(!hist)return;
+  // find day and exercise name from exId
+  const parts=exId.split('-');
+  const di=parseInt(parts[1]),si=parseInt(parts[2]),ei=parseInt(parts[3]);
+  const d=DAYS_DATA[di],s=d.sections[si],e=s.items[ei];
+  const key='log_w'+currentWeek+'_'+d.id+'_'+e.name.replace(/\s/g,'_');
+  const logs=getData(key,[]);
+  if(!logs.length){hist.innerHTML='<div class="no-data">No sets logged for week '+currentWeek+' yet</div>';return;}
+  // find personal best
+  const pb=Math.max(...logs.map(l=>l.weight||0));
+  let html=`<table class="history-table"><thead><tr><th>#</th><th>Weight</th><th>Reps</th><th>Sets</th><th>RPE</th><th>Date</th><th></th></tr></thead><tbody>`;
+  logs.forEach((l,i)=>{
+    const isPB=l.weight===pb&&pb>0;
+    html+=`<tr><td>${i+1}</td><td>${l.weight}kg${isPB?'<span class="pb-badge">PB</span>':''}</td><td>${l.reps}</td><td>${l.sets}</td><td>${l.rpe||'—'}</td><td>${l.date}</td><td><button class="del-entry" onclick="deleteLog('${exId}','${d.id}','${e.name.replace(/'/g,"\\'")}',${i})">✕</button></td></tr>`;
+  });
+  html+='</tbody></table>';
+  // mini chart
+  if(logs.length>1){
+    const weights=logs.map(l=>l.weight||0);
+    const mn=Math.min(...weights),mx=Math.max(...weights);
+    const range=mx-mn||1;
+    const w=300,h=80,pad=6;
+    const pts=weights.map((wt,i)=>{
+      const x=pad+i*(w-pad*2)/(weights.length-1);
+      const y=h-pad-(wt-mn)/range*(h-pad*2);
+      return{x,y,wt};
+    });
+    const pathD=pts.map((p,i)=>(i===0?'M':'L')+p.x+','+p.y).join(' ');
+    const areaD=pathD+' L'+pts[pts.length-1].x+','+(h-2)+' L'+pts[0].x+','+(h-2)+' Z';
+    html+=`<div class="chart-wrap"><div class="chart-canvas-wrap"><svg class="chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#52b788" stop-opacity="0.2"/><stop offset="100%" stop-color="#52b788" stop-opacity="0"/></linearGradient></defs><path class="chart-area" d="${areaD}"/><path class="chart-line" d="${pathD}"/>${pts.map(p=>`<circle class="chart-dot" cx="${p.x}" cy="${p.y}" r="3"/>`).join('')}</svg></div><div class="chart-labels">${weights.map((wt,i)=>`<span>W${i+1}: ${wt}kg</span>`).join('')}</div></div>`;
+  }
+  hist.innerHTML=html;
+}
+
+// ─── VIEW SWITCH ─────────────────────────────────────────────────────────────
+function switchView(v){
+  document.getElementById('programView').classList.toggle('active',v==='program');
+  document.getElementById('trackerView').classList.toggle('active',v==='tracker');
+  document.getElementById('bnav-program').classList.toggle('active',v==='program');
+  document.getElementById('bnav-tracker').classList.toggle('active',v==='tracker');
+  document.getElementById('bnav-days').classList.toggle('active',false);
+  if(v==='tracker'){refreshTrackerData();}
+}
+
+// ─── DAY MODAL (mobile) ──────────────────────────────────────────────────────
+function openDayPicker(){
+  const m=document.getElementById('dayModal');
+  m.style.display='flex';
+  switchView('program');
+  document.getElementById('bnav-days').classList.add('active');
+}
+function closeDayModal(){
+  document.getElementById('dayModal').style.display='none';
+}
+
+// ─── TRACKER PAGE ─────────────────────────────────────────────────────────────
+function refreshTrackerData(){
+  renderMainLiftCards();
+  renderAllExerciseHistory();
+  document.getElementById('noteWeekLabel').textContent=currentWeek;
+  const notes=getData('notes_w'+currentWeek,'');
+  document.getElementById('weekNotesInput').value=notes;
+}
+
+const MAIN_LIFTS=[
+  {name:'SQUAT',dayId:'mon',exName:'High-Bar Back Squat — Heavy'},
+  {name:'DEADLIFT',dayId:'wed',exName:'Conventional Deadlift — Heavy'},
+  {name:'BENCH',dayId:'tue',exName:'Competition Bench Press — Volume'}
+];
+function renderMainLiftCards(){
+  const container=document.getElementById('mainLiftCards');
+  container.innerHTML='';
+  MAIN_LIFTS.forEach(lift=>{
+    // collect all weeks data
+    const allWeekData=[];
+    for(let w=1;w<=TOTAL_WEEKS;w++){
+      const key='log_w'+w+'_'+lift.dayId+'_'+lift.exName.replace(/\s/g,'_');
+      const logs=getData(key,[]);
+      if(logs.length){
+        const best=Math.max(...logs.map(l=>l.weight||0));
+        allWeekData.push({week:w,weight:best});
+      }
+    }
+    const pb=allWeekData.length?Math.max(...allWeekData.map(d=>d.weight)):0;
+    const cur=allWeekData.filter(d=>d.week===currentWeek);
+    const curMax=cur.length?Math.max(...cur.map(d=>d.weight)):0;
+
+    let chartHTML='';
+    if(allWeekData.length>1){
+      const ws=allWeekData.map(d=>d.weight);
+      const mn=Math.min(...ws),mx=Math.max(...ws);
+      const range=mx-mn||1;
+      const cw=200,ch=60,pad=4;
+      const pts=allWeekData.map((d,i)=>{
+        const x=pad+i*(cw-pad*2)/(allWeekData.length-1||1);
+        const y=ch-pad-(d.weight-mn)/range*(ch-pad*2);
+        return{x,y};
+      });
+      const pathD=pts.map((p,i)=>(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+      const areaD=pathD+' L'+pts[pts.length-1].x.toFixed(1)+','+(ch-1)+' L'+pts[0].x.toFixed(1)+','+(ch-1)+' Z';
+      chartHTML=`<div style="margin-top:8px"><svg style="width:100%;height:60px" viewBox="0 0 ${cw} ${ch}" preserveAspectRatio="none"><defs><linearGradient id="ag_${lift.name}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c9a84c" stop-opacity="0.25"/><stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/></linearGradient></defs><path fill="url(#ag_${lift.name})" d="${areaD}"/><path fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" d="${pathD}"/>${pts.map(p=>`<circle fill="#c9a84c" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.5"/>`).join('')}</svg></div>`;
+    }
+
+    const card=document.createElement('div');
+    card.className='lift-card';
+    card.innerHTML=`<div class="lc-name">${lift.name}</div><div class="lc-pr">${pb?pb+'kg':'No data'}</div><div class="lc-pr-label">All-Time Best${curMax&&curMax!==pb?' · This Week: '+curMax+'kg':''}</div>${chartHTML}`;
+    container.appendChild(card);
+  });
+}
+
+function renderAllExerciseHistory(){
+  const container=document.getElementById('allExerciseHistory');
+  container.innerHTML='';
+  DAYS_DATA.forEach(d=>{
+    d.sections.forEach(s=>{
+      if(s.type!=='exercises')return;
+      s.items.forEach(e=>{
+        const key='log_w'+currentWeek+'_'+d.id+'_'+e.name.replace(/\s/g,'_');
+        const logs=getData(key,[]);
+        if(!logs.length)return;
+        const pb=Math.max(...logs.map(l=>l.weight||0));
+        let html=`<div class="section" style="margin-bottom:10px"><div class="sec-head" style="cursor:default"><div style="display:flex;flex-direction:column;gap:2px;flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">${e.name}</div><div style="font-size:11px;color:var(--muted)">${d.day} · Week ${currentWeek}</div></div><div style="font-family:var(--font-head);font-size:1.1rem;color:var(--gold)">${pb>0?pb+'kg':'BW'}</div></div><div class="sec-body"><table class="history-table"><thead><tr><th>Set</th><th>Weight</th><th>Reps</th><th>RPE</th><th>Date</th></tr></thead><tbody>`;
+        logs.forEach((l,i)=>{
+          const isPB=l.weight===pb&&pb>0;
+          html+=`<tr><td>${i+1}</td><td>${l.weight}kg${isPB?'<span class="pb-badge">PB</span>':''}</td><td>${l.reps}</td><td>${l.rpe||'—'}</td><td>${l.date}</td></tr>`;
+        });
+        html+='</tbody></table></div></div>';
+        container.innerHTML+=html;
+      });
+    });
+  });
+  if(!container.innerHTML){
+    container.innerHTML=`<div class="section"><div class="sec-body"><div class="no-data">No exercises logged for Week ${currentWeek} yet.<br>Go to the Program tab and tap any exercise to log your sets.</div></div></div>`;
+  }
+}
+
+// ─── NOTES ───────────────────────────────────────────────────────────────────
+function saveNotes(){
+  const notes=document.getElementById('weekNotesInput').value;
+  setData('notes_w'+currentWeek,notes);
+  const saved=document.getElementById('notesSaved');
+  saved.classList.add('show');
+  setTimeout(()=>saved.classList.remove('show'),2000);
+}
+
+// ─── WEEKLY SUMMARY ──────────────────────────────────────────────────────────
+// (embedded in tracker view, not needed as separate function)
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+buildWeekSelect();
+buildDayNav();
+buildDayViews();
+buildProgressionTable();
+updateDayNavDots();
+// Highlight saved week on load
+highlightCurrentWeekColumn();
+
+function buildProgressionTable(){
+  // inject after hero stats
+  const hero=document.querySelector('.hero');
+  const div=document.createElement('div');
+  div.id='progTable';
+  div.style.cssText='margin-top:16px;overflow-x:auto;-webkit-overflow-scrolling:touch';
+
+  const lifts=[
+    {key:'squat',label:'SQUAT',color:'#e07b35'},
+    {key:'bench',label:'BENCH',color:'#5e8fd4'},
+    {key:'deadlift',label:'DEADLIFT',color:'#9b72cf'}
+  ];
+
+  let html=`<table style="width:100%;border-collapse:collapse;font-size:11px;min-width:520px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 8px;color:var(--muted);font-size:10px;border-bottom:1px solid var(--border);white-space:nowrap">WEEK</th>
+        ${Array.from({length:12},(_,i)=>{
+          const w=i+1;
+          const isDeload=w===4||w===8;
+          const isPeak=w===12;
+          const bg=isDeload?'rgba(82,183,136,.1)':isPeak?'rgba(201,168,76,.12)':'transparent';
+          const col=isDeload?'var(--green)':isPeak?'var(--gold)':'var(--muted)';
+          const label=isDeload?'DL':isPeak?'PK':w;
+          return `<th id="pth-w${w}" style="text-align:center;padding:5px 4px;color:${col};font-size:10px;border-bottom:1px solid var(--border);background:${bg};white-space:nowrap;border-radius:3px 3px 0 0">${label}</th>`;
+        }).join('')}
+      </tr>
+    </thead>
+    <tbody>`;
+
+  lifts.forEach(l=>{
+    html+=`<tr>
+      <td style="padding:7px 8px;color:${l.color};font-family:var(--font-head);font-size:12px;letter-spacing:1px;white-space:nowrap">${l.label}</td>
+      ${Array.from({length:12},(_,i)=>{
+        const w=i+1;
+        const ts=getTopSet(l.key,w);
+        const isDeload=w===4||w===8;
+        const isPeak=w===12;
+        const bg=isDeload?'rgba(82,183,136,.05)':isPeak?'rgba(201,168,76,.07)':'transparent';
+        return `<td id="ptd-${l.key}-w${w}" style="text-align:center;padding:6px 4px;background:${bg};border-bottom:1px solid #141414;vertical-align:middle">
+          <div style="font-weight:600;color:var(--text);font-size:12px">${ts.kg}kg</div>
+          <div style="color:var(--muted);font-size:10px;margin-top:1px">${ts.label}</div>
+        </td>`;
+      }).join('')}
+    </tr>`;
+  });
+
+  html+='</tbody></table>';
+  div.innerHTML=`<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="color:var(--gold-light);font-size:11px;font-family:var(--font-head);letter-spacing:1px">12-WEEK TOP SET PROGRESSION</span>
+    <span style="color:var(--green);font-size:9px">● DL = Deload</span>
+    <span style="color:var(--gold);font-size:9px">● PR = New max attempt</span>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+    <div style="background:#1a0e04;border:1px solid rgba(224,123,53,.3);border-radius:5px;padding:5px 10px;font-size:11px">
+      <span style="color:#e07b35;font-family:var(--font-head);letter-spacing:1px">SQUAT</span>
+      <span style="color:var(--muted);margin:0 5px">→</span>
+      <span style="color:var(--text)">190kg now</span>
+      <span style="color:var(--muted);margin:0 5px">→</span>
+      <span style="color:var(--gold);font-weight:600">205kg W12</span>
+    </div>
+    <div style="background:#040d1a;border:1px solid rgba(94,143,212,.3);border-radius:5px;padding:5px 10px;font-size:11px">
+      <span style="color:#5e8fd4;font-family:var(--font-head);letter-spacing:1px">BENCH</span>
+      <span style="color:var(--muted);margin:0 5px">→</span>
+      <span style="color:var(--text)">120kg now</span>
+      <span style="color:var(--muted);margin:0 5px">→</span>
+      <span style="color:var(--gold);font-weight:600">132.5kg W12</span>
+    </div>
+    <div style="background:#0d0a1a;border:1px solid rgba(155,114,207,.3);border-radius:5px;padding:5px 10px;font-size:11px">
+      <span style="color:#9b72cf;font-family:var(--font-head);letter-spacing:1px">DEADLIFT</span>
+      <span style="color:var(--muted);margin:0 5px">→</span>
+      <span style="color:var(--text)">215kg now</span>
+      <span style="color:var(--muted);margin:0 5px">→</span>
+      <span style="color:var(--gold);font-weight:600">227.5kg W12</span>
+    </div>
+  </div>
+  ${html}`;
+  hero.appendChild(div);
+
+  // highlight current week column
+  highlightCurrentWeekColumn();
+}
+
+function highlightCurrentWeekColumn(){
+  for(let w=1;w<=12;w++){
+    const th=document.getElementById('pth-w'+w);
+    const isDeload=w===4||w===8;
+    const isPeak=w===12;
+    const isCur=w===currentWeek;
+    if(th){
+      th.style.outline=isCur?'1px solid var(--gold)':'none';
+      th.style.fontWeight=isCur?'700':'400';
+    }
+    ['squat','bench','deadlift'].forEach(lk=>{
+      const td=document.getElementById(`ptd-${lk}-w${w}`);
+      if(td){
+        const baseBg=isDeload?'rgba(82,183,136,.05)':isPeak?'rgba(201,168,76,.07)':'transparent';
+        td.style.background=isCur?'rgba(201,168,76,.15)':baseBg;
+        td.style.outline=isCur?'1px solid rgba(201,168,76,.3)':'none';
+      }
+    });
+  }
+}
+</script>
+</body>
+</html>
